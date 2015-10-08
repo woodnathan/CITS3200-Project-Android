@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    //set no action bar, but change time and date picker style
+    <!--<style name = "NoActionBar" parent = "@android:style/Theme.Holo.Light">
+        <item name = "android:windowActionBar">false</item>
+        <item name = "android:windowNoTitle">true</item>
+    </style>-->
+
+
+</resources>

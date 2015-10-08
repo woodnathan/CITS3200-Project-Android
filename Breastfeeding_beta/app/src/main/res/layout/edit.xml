@@ -1,0 +1,309 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+
+    <RelativeLayout
+        android:id="@+id/Header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#8dd9b3">
+
+        <Button
+            android:id="@+id/CancelButton"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:textColor="#FFF"
+            android:text="@string/Cancel"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:textSize="20dp"/>
+
+        <Button
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:textColor="#FFF"
+            android:text="@string/Feed"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:paddingTop="20dp"
+            android:textSize="20dp"/>
+
+        <Button
+            android:id="@+id/DoneButton"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:textColor="#FFF"
+            android:text="@string/Done"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:paddingTop="20dp"
+            android:textStyle="bold"
+            android:textSize="20dp"/>
+
+
+    </RelativeLayout>
+
+    <ScrollView
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/Header">
+
+        <RelativeLayout
+            android:id="@+id/edit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/Header"
+            >
+
+            <TextView
+                android:id="@+id/StartDate"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/START_DATE"
+                android:layout_alignParentLeft="true" />
+
+            <TextView
+                android:id="@+id/EndDate"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="110dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/END_DATE"
+                android:layout_alignParentRight="true"/>
+
+            <Button
+                android:id="@+id/SelectTime1"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:background="@drawable/textview_border"
+                android:onClick="showTimePickerDialog1"
+                android:layout_below="@+id/StartTime"
+                android:layout_alignParentLeft="true"/>
+
+            <Button
+                android:id="@+id/SelectTime2"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/EndTime"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/textview_border"
+                android:onClick="showTimePickerDialog2"/>
+
+            <TextView
+                android:id="@+id/StartTime"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/START_TIME"
+                android:layout_below="@+id/SelectDate1"/>
+
+            <TextView
+                android:id="@+id/EndTime"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="110dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="@string/END_TIME"
+                android:layout_below="@+id/SelectDate2"/>
+
+            <Button
+                android:id="@+id/SelectDate1"
+                android:layout_width="150dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_height="40dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/StartDate"
+                android:background="@drawable/textview_border"
+                android:onClick="showDatePickerDialog1"/>
+
+            <Button
+                android:id="@+id/SelectDate2"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/EndDate"
+                android:background="@drawable/textview_border"
+                android:onClick="showDatePickerDialog2"/>
+
+            <TextView
+                android:id="@+id/Type"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/TYPE"
+                android:layout_below="@+id/SelectTime1"/>
+
+            <Button
+                android:id="@+id/btnType1"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:text="@string/Breastfeed"
+                android:textSize="12dp"
+                android:layout_width="104dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/Type"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/textview_border"
+                android:onClick="onClick"/>
+
+            <Button
+                android:id="@+id/btnType3"
+                android:layout_marginTop="5dp"
+                android:layout_width="102dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/Type"
+                android:layout_centerInParent="true"
+                android:background="@drawable/textview_border"
+                android:text="@string/Expressed"
+                android:textSize="12dp"
+                android:onClick="onClick"/>
+
+            <Button
+                android:id="@+id/btnType2"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:textSize="12dp"
+                android:layout_width="104dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/Type"
+                android:background="@drawable/textview_border"
+                android:onClick="onClick"
+                android:text="@string/Supplementary"/>
+
+            <TextView
+                android:id="@+id/Breast"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text=""
+                android:layout_below="@+id/btnType1"/>
+
+            <Button
+                android:id="@+id/btnBreast1"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:text=""
+                android:layout_width="155dp"
+                android:layout_height="40dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/Breast"
+                android:background="@drawable/textview_border"
+                android:onClick="onClickBreast"/>
+
+            <Button
+                android:id="@+id/btnBreast2"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:text=""
+                android:layout_width="155dp"
+                android:layout_height="40dp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/Breast"
+                android:background="@drawable/textview_border"
+                android:onClick="onClickBreast"/>
+
+            <TextView
+                android:id="@+id/WeightBefore"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/WEIGHT_BEFORE"
+                android:layout_below="@+id/btnBreast1"/>
+
+            <TextView
+                android:id="@+id/WeightAfter"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="78dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="@string/WEIGHT_AFTER"
+                android:layout_below="@+id/btnBreast2"/>
+
+            <EditText
+                android:id="@+id/btnWeight1"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:hint="@string/grams"
+                android:gravity="left"
+                android:padding="7dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/WeightBefore"
+                android:background="@drawable/textview_border"
+                />
+
+            <EditText
+                android:id="@+id/btnWeight2"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:hint="@string/grams"
+                android:gravity="left"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/WeightAfter"
+                android:background="@drawable/textview_border"
+                android:padding="7dp"/>
+
+            <TextView
+                android:id="@+id/Coments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/Coments"
+                android:layout_below="@+id/btnWeight1"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"/>
+
+            <EditText
+                android:layout_width="310dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/Coments"
+                android:layout_marginLeft="25dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/textview_border"
+                android:maxLines="4"
+                android:hint="@string/Coments"
+                android:layout_marginBottom="20dp"
+                />
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+
+</RelativeLayout>

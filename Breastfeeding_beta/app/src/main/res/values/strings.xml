@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Breastfeeding_beta</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    //edit
+    <string name="Cancel">Cancel</string>
+    <string name="Feed">Feed</string>
+    <string name="Done">Done</string>
+    <string name="START_DATE">START DATE</string>
+    <string name="END_DATE">END DATE</string>
+    <string name="START_TIME">START TIME</string>
+    <string name="END_TIME">END TIME</string>
+    <string name="TYPE">TYPE</string>
+    <string name="Breastfeed">Breastfeed</string>
+    <string name="Expressed">Expressed</string>
+    <string name="Supplementary">Supplementary</string>
+    <string name="BREAST">BREAST</string>
+    <string name="Left">Left</string>
+    <string name="Right">Right</string>
+    <string name="WEIGHT_BEFORE">WEIGHT BEFORE</string>
+    <string name="WEIGHT_AFTER">WEIGHT AFTER</string>
+    <string name="grams">grams</string>
+    <string name="Coments">Coments</string>
+
+    //login
+    <string name="HHLRG">Hartmann Human Lactation Research Group</string>
+    <string name="USERNAME">USERNAME</string>
+    <string name="PASSWORD">PASSWORD</string>
+    <string name="LOGIN">LOGIN</string>
+    <string name="About">About >></string>
+    <string name="error_invalid_user">This username is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+</resources>

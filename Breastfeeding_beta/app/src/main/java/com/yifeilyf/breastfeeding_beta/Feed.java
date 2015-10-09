@@ -12,8 +12,8 @@ public class Feed implements Parcelable {
     private int ID;
     private String startDate = "";
     private String endDate = "";
-    private int startTime = -1;
-    private int endTime = -1;
+    private String startTime = "";
+    private String endTime =  "";
     private int type = -1; //(0,1,2) breastfeed expressed supplementary
     private int subType = -1; // (0,1) left,right or expressed,supplementary
     private double weightBefore = -1;
@@ -53,22 +53,22 @@ public class Feed implements Parcelable {
      *
      * @return
      */
-    public int getStartTime() {return startTime;}
+    public String getStartTime() {return startTime;}
     /**
      *
      * @return
      */
-    public void putStartTime(int time) {startTime = time;}
+    public void putStartTime(String time) {startTime = time;}
     /**
      *
      * @return
      */
-    public int getEndTime() {return endTime;}
+    public String getEndTime() {return endTime;}
     /**
      *
      * @return
      */
-    public void putEndTime(int time) {endTime = time;}
+    public void putEndTime(String time) {endTime = time;}
     /**
      *
      * @return
@@ -108,7 +108,7 @@ public class Feed implements Parcelable {
      *
      * @return
      */
-    public void put(double weight) {weightAfter = weight;}
+    public void putWeightAfter(double weight) {weightAfter = weight;}
     /**
      *
      * @return
@@ -118,7 +118,7 @@ public class Feed implements Parcelable {
      *
      * @return
      */
-    public void put(String comment) {this.comment = comment;}
+    public void putComment(String comment) {this.comment = comment;}
 
     /**
      *
@@ -128,7 +128,7 @@ public class Feed implements Parcelable {
 
 
     public String toString() {
-        return "Feed " + getID();
+        return getStartDate() + " " + getStartTime();
     }
 
 
@@ -141,8 +141,8 @@ public class Feed implements Parcelable {
         ID = in.readInt();
         startDate = in.readString();
         endDate = in.readString();
-        startTime= in.readInt();
-        endTime= in.readInt();
+        startTime= in.readString();
+        endTime= in.readString();
         type= in.readInt();
         subType= in.readInt();
         weightBefore= in.readDouble();
@@ -155,8 +155,8 @@ public class Feed implements Parcelable {
         out.writeInt(ID);
         out.writeString(startDate);
         out.writeString(endDate);
-        out.writeInt(startTime);
-        out.writeInt(endTime);
+        out.writeString(startTime);
+        out.writeString(endTime);
         out.writeInt(type);
         out.writeInt(subType);
         out.writeDouble(weightBefore);

@@ -15,13 +15,17 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import java.util.Calendar;
 
 public class edit extends Activity {
+    //Feed object to be edited
+    Feed receivedFeed;
 
+    //Setup UI interfaces
     private TextView resultTime1, resultTime2;
     private TextView resultDate1, resultDate2;
 
@@ -42,12 +46,24 @@ public class edit extends Activity {
         resultDate1 = (TextView) findViewById(R.id.SelectDate1);
         resultDate2 = (TextView) findViewById(R.id.SelectDate2);
 
+        //Receive the feed to be edited and load current data to the UI
+
+        Intent intent = getIntent();
+
+        receivedFeed = intent.getParcelableExtra("com.yifeilyf.breastfeeding_beta.newFeed");
+        int editRequestCode = intent.getIntExtra("com.yifeilyf.breastfeeding_beta.editRequestCode",0);
+        //if request code is 1 the feed can be loaded and editing disabled until edit option is selected
+        if(editRequestCode == 1){
+            //TODO: load feed to page and disable editing
+        }
+
         //Cancel button
         Button btnCancel = (Button) findViewById(R.id.CancelButton);
         btnCancel.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), list.class);
-                startActivity(intent, null);
+                setResult(Activity.RESULT_CANCELED,intent);
+                finish();
             }
         });
 
@@ -58,8 +74,11 @@ public class edit extends Activity {
 
         btnDone.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent intent = new Intent(v.getContext(), list.class);
-                startActivity(intent);
+                //TODO: Add checks to ensure all data has been entered.
+
+                //Calls function to save all data to the feed and return it to the list screen
+                saveAndReturn(v);
+
             }
         });
 
@@ -259,4 +278,38 @@ public class edit extends Activity {
         in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    /**
+     * Temporary function used to handle the onClick for the eventual submit button
+     * This collects the data from the page, loads in into the feed object and sends it back to the calling activity
+     * @param v The view of the button that was clicked
+     */
+    public void saveAndReturn(View v) {
+        //This function assumes that all required data has been entered already
+        //It will simply save and send to keep things simple
+        EditText text = (EditText)findViewById(R.id.btnWeight1);
+        String t = text.getText().toString();
+        //TODO: fix this bit
+
+        //Button sd = (Button)findViewById(R.id.SelectDate1);
+        receivedFeed.putStartDate(resultDate1.getText().toString());
+       // Button ed = (Button)findViewById(R.id.SelectDate2);
+        receivedFeed.putEndDate(resultDate2.getText().toString());
+       // Button st = (Button)findViewById(R.id.SelectTime1);
+        receivedFeed.putStartTime(resultTime1.getText().toString());
+        //Button et = (Button)findViewById(R.id.SelectTime2);
+        receivedFeed.putEndTime(resultTime2.getText().toString());
+
+
+        receivedFeed.putType(1);
+        receivedFeed.putSubType(1);
+        receivedFeed.putWeightBefore(11);
+        receivedFeed.putWeightAfter(1);
+        receivedFeed.putComment("");
+
+        Intent intent = new Intent();
+        intent.putExtra("com.yifeilyf.breastfeeding_beta.editedFeed", receivedFeed);
+        setResult(Activity.RESULT_OK, intent);
+        finish();
+
+    }
 }

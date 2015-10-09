@@ -54,7 +54,21 @@ public class edit extends Activity {
         int editRequestCode = intent.getIntExtra("com.yifeilyf.breastfeeding_beta.editRequestCode",0);
         //if request code is 1 the feed can be loaded and editing disabled until edit option is selected
         if(editRequestCode == 1){
-            //TODO: load feed to page and disable editing
+            //TODO: DISABLE EDITING OF PAGE
+
+            //load saved feed details to the page
+            resultDate1.setText(receivedFeed.getStartDate());
+            resultDate2.setText(receivedFeed.getEndDate());
+            resultTime1.setText(receivedFeed.getStartTime());
+            resultTime2.setText(receivedFeed.getEndTime());
+            EditText wb = (EditText)findViewById(R.id.btnWeight1);
+            EditText wa = (EditText)findViewById(R.id.btnWeight2);
+            TextView com = (TextView)findViewById(R.id.Coments);
+            wb.setText("" + receivedFeed.getWeightBefore());
+            wa.setText("" + receivedFeed.getWeightAfter());
+            com.setText(receivedFeed.getComment());
+
+
         }
 
         //Cancel button
@@ -62,6 +76,7 @@ public class edit extends Activity {
         btnCancel.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), list.class);
+                //result cancelled tells the list page not to change the list or feeds
                 setResult(Activity.RESULT_CANCELED,intent);
                 finish();
             }
@@ -75,6 +90,7 @@ public class edit extends Activity {
         btnDone.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 //TODO: Add checks to ensure all data has been entered.
+                //TODO: data validation checks need to be added as well
 
                 //Calls function to save all data to the feed and return it to the list screen
                 saveAndReturn(v);
@@ -286,25 +302,27 @@ public class edit extends Activity {
     public void saveAndReturn(View v) {
         //This function assumes that all required data has been entered already
         //It will simply save and send to keep things simple
-        EditText text = (EditText)findViewById(R.id.btnWeight1);
-        String t = text.getText().toString();
-        //TODO: fix this bit
 
-        //Button sd = (Button)findViewById(R.id.SelectDate1);
         receivedFeed.putStartDate(resultDate1.getText().toString());
-       // Button ed = (Button)findViewById(R.id.SelectDate2);
+
         receivedFeed.putEndDate(resultDate2.getText().toString());
-       // Button st = (Button)findViewById(R.id.SelectTime1);
+
         receivedFeed.putStartTime(resultTime1.getText().toString());
-        //Button et = (Button)findViewById(R.id.SelectTime2);
+
         receivedFeed.putEndTime(resultTime2.getText().toString());
 
-
+        EditText wb = (EditText)findViewById(R.id.btnWeight1);
+        EditText wa = (EditText)findViewById(R.id.btnWeight2);
+        TextView com = (TextView)findViewById(R.id.Coments);
+        //TODO: assign Type 0,1,2 = breastfeed,expressed,supplementary
         receivedFeed.putType(1);
+        //TODO: assign SubType 0,1 = left,right or expressed,supplementary
         receivedFeed.putSubType(1);
-        receivedFeed.putWeightBefore(11);
-        receivedFeed.putWeightAfter(1);
-        receivedFeed.putComment("");
+
+
+        receivedFeed.putWeightBefore(Double.parseDouble(wb.getText().toString()));
+        receivedFeed.putWeightAfter(Double.parseDouble(wa.getText().toString()));
+        receivedFeed.putComment(com.getText().toString());
 
         Intent intent = new Intent();
         intent.putExtra("com.yifeilyf.breastfeeding_beta.editedFeed", receivedFeed);

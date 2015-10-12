@@ -110,14 +110,17 @@ public class list extends Activity {
         //TODO: Add code to update the database with new feed data
         //TODO: Make the list sort by date/time
         //requestCode is the identifier sent to the edit activity, 0=newFeed 1=editFeed
-        if(resultCode != RESULT_CANCELED) {
+        Feed editedFeed = data.getParcelableExtra("com.yifeilyf.breastfeeding_beta.editedFeed");
+        if (resultCode == -100) {
+            //TODO: delete feed
+            deleteFeed(editedFeed);
+            feedListAdapter.notifyDataSetChanged();
+        } else if(resultCode != RESULT_CANCELED) {
             if(requestCode == 0) {
-                Feed editedFeed = data.getParcelableExtra("com.yifeilyf.breastfeeding_beta.editedFeed");
                 //TODO Error handling?
                 addNewFeed(editedFeed);
                 feedListAdapter.notifyDataSetChanged();
             } else if(requestCode == 1) {
-                Feed editedFeed = data.getParcelableExtra("com.yifeilyf.breastfeeding_beta.editedFeed");
                 //TODO Error handling?
                 updateFeed(editedFeed);
                 feedListAdapter.notifyDataSetChanged();
@@ -165,4 +168,24 @@ public class list extends Activity {
         feedBackingArray.add(newFeed);
         return true;
     }
+
+    /**
+     * Private method to delete a feed from the backing array
+     * @param deleted the feed to be deleted from the list
+     * @return true is successfully deleted the feed, false if feed not found
+     */
+    private boolean deleteFeed(Feed deleted) {
+        int id = deleted.getID();
+        for(int i = 0; i < feedBackingArray.size(); i++) {
+            if(feedBackingArray.get(i) != null) {
+                if(feedBackingArray.get(i).getID() == id) {
+                    //delete the feed from the backing array
+                    feedBackingArray.remove(i);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

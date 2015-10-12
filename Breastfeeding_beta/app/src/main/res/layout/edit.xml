@@ -213,7 +213,6 @@
                 android:id="@+id/btnBreast1"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"
-                android:text=""
                 android:layout_width="155dp"
                 android:layout_height="40dp"
                 android:layout_alignParentLeft="true"
@@ -225,7 +224,6 @@
                 android:id="@+id/btnBreast2"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="25dp"
-                android:text=""
                 android:layout_width="155dp"
                 android:layout_height="40dp"
                 android:layout_alignParentRight="true"
@@ -304,6 +302,15 @@
 
     </ScrollView>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:id="@+id/btnDelete"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:visibility="invisible"
+        android:onClick="deleteFeed"/>
 
 
 </RelativeLayout>

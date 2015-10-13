@@ -21,6 +21,9 @@
             android:configChanges="orientation|screenSize"
             >
         </activity>
+        <activity android:name=".about">
+
+        </activity>
         <!--when the device change orientation, the Activity would not be restarted by configChanges-->
         <!--hide the soft keyboard when the Activity starts by windowSoftInputMode-->
         <activity

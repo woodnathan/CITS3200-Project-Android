@@ -4,39 +4,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
-import android.hardware.input.InputManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,8 +27,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yifei on 9/17/2015.
@@ -75,7 +55,6 @@ public class login extends Activity{
         //set content view after above sequence (to avoid crash)
         this.setContentView(R.layout.login);
 
-
         setContentView(R.layout.login);
 
         mEmailView = (EditText) findViewById(R.id.tvLogin);
@@ -89,22 +68,28 @@ public class login extends Activity{
                 //Intent intent = new Intent(v.getContext(), list.class);
                 //startActivity(intent);
             }
-
         });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
         //locked screen on portraity
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //hide the keyboard when click outside the textview
+        //About button, return to instruction page when it is clicked
+        Button aboutButton = (Button) findViewById(R.id.btnAbout);
+        aboutButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), about.class);
+                startActivity(intent);
+            }
+        });
+
+        //hide the keyboard when click outside the EditView
         LinearLayout layout = (LinearLayout) findViewById(R.id.login);
-        layout.setOnTouchListener(new View.OnTouchListener()
-        {
+        layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent ev)
-            {
+            public boolean onTouch(View view, MotionEvent ev) {
                 hideKeyboard(view);
                 return false;
             }
@@ -112,12 +97,19 @@ public class login extends Activity{
 
     }
 
-    //hide the keyboard
+    /**
+     * The method will hide the soft keyboard
+     * @param view the view that is not a EditView is clicked
+     */
     protected void hideKeyboard(View view)
     {
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
+
+    /**
+     *  This method include login validation
+     */
     public void attemptLogin() {
         if (mAuthTask != null) {
             return;
@@ -165,11 +157,21 @@ public class login extends Activity{
         }
     }
 
+    /**
+     * This method is validation of email
+     * @param email the email is typed by user
+     * @return true if length of email is larger than 3, otherwise false
+     */
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.length() > 3;
     }
 
+    /**
+     * This method is validation of password
+     * @param password the password is typed by user
+     * @return true is length of password is larger than 3, otherwise false
+     */
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 3;
@@ -211,6 +213,9 @@ public class login extends Activity{
         }
     }
 
+    /**
+     *
+     */
     private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -307,6 +312,10 @@ public class login extends Activity{
             return true;
         }
 
+        /**
+         *
+         * @param success login successful if password and username are corrected, otherwise show a error message
+         */
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
@@ -322,6 +331,9 @@ public class login extends Activity{
             }
         }
 
+        /**
+         *
+         */
         @Override
         protected void onCancelled() {
             mAuthTask = null;

@@ -68,15 +68,16 @@
                 android:layout_marginTop="20dp"
                 android:background="#dcac01"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <Button
+                android:id="@+id/btnAbout"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
                 android:text="@string/About"
                 android:textColor="#FFF"
                 android:layout_marginTop="20dp"
                 android:textSize="20dp"
-                android:gravity="center"
-                android:singleLine="true"
                 android:layout_marginBottom="20dp"/>
 
         </LinearLayout>

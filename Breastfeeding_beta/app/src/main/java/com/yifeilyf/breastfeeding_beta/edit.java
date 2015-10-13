@@ -7,12 +7,12 @@ import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -52,7 +52,6 @@ public class edit extends Activity {
         resultDate2 = (TextView) findViewById(R.id.SelectDate2);
 
         //Receive the feed to be edited and load current data to the UI
-
         Intent intent = getIntent();
 
         receivedFeed = intent.getParcelableExtra("com.yifeilyf.breastfeeding_beta.newFeed");
@@ -81,6 +80,7 @@ public class edit extends Activity {
             final Button btnDone = (Button) findViewById(R.id.DoneButton);
             btnDone.setText("Edit");
 
+            //iteration through the whole activity and find EditView and Button, then disable them
             RelativeLayout layout = (RelativeLayout) findViewById(R.id.edit);
             for(int i = 0; i<layout.getChildCount(); i++){
                 View edit = layout.getChildAt(i);
@@ -90,10 +90,9 @@ public class edit extends Activity {
                     ((EditText)edit).setEnabled(false);
                 }
             }
-
         }
 
-        //Cancel button
+        //Cancel button, return to list page when it is clicked
         Button btnCancel = (Button) findViewById(R.id.CancelButton);
         btnCancel.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
@@ -104,9 +103,8 @@ public class edit extends Activity {
             }
         });
 
+
         //Done Button, pass data to a TextView
-
-
         final Button btnDone = (Button) findViewById(R.id.DoneButton);
 
         btnDone.setOnClickListener(new View.OnClickListener(){
@@ -136,15 +134,10 @@ public class edit extends Activity {
             }
         });
 
-
-
-
-
-
         //locked screen on portraity
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        //hide the keyboard
+        //hide the keyboard when click outside the EditView
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.edit);
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -166,6 +159,11 @@ public class edit extends Activity {
     }
 
     //set Time picker
+    /**
+     * the method will be called when user try to select time and it will set a Time picker
+     * To display a TimePickerDialog using DialogFragment, you need to define a fragment class that extends
+     * DialogFragment and return a TimePickerDialog from the fragment's onCreateDialog() method.
+     */
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener{
 
@@ -189,6 +187,12 @@ public class edit extends Activity {
             return new TimePickerDialog(getActivity(), this, hour, minute, DateFormat.is24HourFormat(getActivity()));
         }
 
+        /**
+         * the method will be called when user have selected the time and the selected time will be showed on a TextView
+         * @param view the view of button that is clicked
+         * @param hourOfDay the hour that user selects
+         * @param minute the minute that user selects
+         */
         public void onTimeSet(TimePicker view, int hourOfDay, int minute){
             //pass value to mResultText
             String time = Integer.toString(hourOfDay)+":"+Integer.toString(minute);
@@ -197,17 +201,31 @@ public class edit extends Activity {
 
     }
 
+    /**
+     * The method will be called when user clicks button to select a start time
+     * @param v the view of the button that is clicked
+     */
     public void showTimePickerDialog1(View v){
         DialogFragment newFragment = new TimePickerFragment(resultTime1);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
+    /**
+     * The method will be called when user clicks button to select a end time
+     * @param v the view of the button that is clicked
+     */
     public void showTimePickerDialog2(View v){
         DialogFragment newFragment = new TimePickerFragment(resultTime2);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
     //set Date picker
+
+    /**
+     * the method will be called when user try to select date and it will set a Date picker
+     * To display a DatePickerDialog using DialogFragment, you need to define a fragment class that extends
+     * DialogFragment and return a DatePickerDialog from the fragment's onCreateDialog() method.
+     */
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
@@ -216,7 +234,7 @@ public class edit extends Activity {
         public DatePickerFragment(){
             //default constructor
         }
-
+        //constructor
         public DatePickerFragment(TextView textView){
             mResultText = textView;
         }
@@ -233,32 +251,49 @@ public class edit extends Activity {
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
+        /**
+         * the method will be called when user have selected the date and the selected date will be showed on a TextView
+         * @param view the view of button that is clicked
+         * @param year the year that user selects
+         * @param month the month that user selects
+         * @param day the day that user selects
+         */
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
-            String date = Integer.toString(day)+"/"+Integer.toString(month)+"/"+Integer.toString(year);
+            String date = Integer.toString(day)+"/"+Integer.toString(month+1)+"/"+Integer.toString(year);
             mResultText.setText(date);
         }
     }
 
+    /**
+     * The method will be called when user clicks button to select a start date
+     * @param v the view of the button that is clicked
+     */
     public void showDatePickerDialog1(View v) {
         DialogFragment newFragment = new DatePickerFragment(resultDate1);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
+    /**
+     * The method will be called when user clicks button to select a end date
+     * @param v the view of the button that is clicked
+     */
     public void showDatePickerDialog2(View v) {
         DialogFragment newFragment = new DatePickerFragment(resultDate2);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
-
-    //set color change when click Type button
+    /**
+     * this method is called when user try to select the breast type and it will set focusable
+     * and background on the clicked button
+     * @param v The view of the button that is clicked
+     */
     Button btnType, btnLeftFeedType, btnRightFeedType;
     TextView FeedType;
 
-
     public void onClick(View v){
-
         switch (v.getId()){
+            //type breastfeed
             case R.id.btnType1:
                 //used to set value in feed object
                 selectedFeedType = 0;
@@ -278,6 +313,7 @@ public class edit extends Activity {
                 btnRightFeedType.setText("Right");
                 break;
 
+            //type expressed
             case R.id.btnType2:
                 //used to set value in feed object
                 selectedFeedType = 2;
@@ -297,6 +333,7 @@ public class edit extends Activity {
                 btnRightFeedType.setText("Formula");
                 break;
 
+            //type supplementary
             case R.id.btnType3:
                 //used to set value in feed object
                 selectedFeedType = 1;
@@ -318,9 +355,13 @@ public class edit extends Activity {
         }
     }
 
-
-    //set color change when click Breast button
+    /**
+     * This method will be called when user try to select subtype of breast type and
+     * it will set focusable and background on the clicked button
+     * @param v the view of the button that is clicked
+     */
     Button btnBreast;
+
     public void onClickBreast(View v){
         switch (v.getId()){
             case R.id.btnBreast1:
@@ -350,7 +391,10 @@ public class edit extends Activity {
         }
     }
 
-    //hide the keyboard
+    /**
+     * The method will hide the soft keyboard
+     * @param view the view that is not a EditView is clicked
+     */
     protected void hideKeyboard(View view)
     {
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

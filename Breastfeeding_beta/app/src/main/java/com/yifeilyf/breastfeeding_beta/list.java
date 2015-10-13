@@ -1,39 +1,20 @@
 package com.yifeilyf.breastfeeding_beta;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class list extends Activity {
 
-    String startTime;
-    String endTime;
-    String whatDate;
-    ListView lv;
-    ArrayAdapter<String> adapter;
-
     //Initialise backing data structure variables
-
     private int feedCount = 0;
     private ArrayList<Feed> feedBackingArray = new ArrayList<Feed>();
 
@@ -69,7 +50,6 @@ public class list extends Activity {
                 Feed existingFeed = (Feed) adapter.getItemAtPosition(position);
                 Intent intent = new Intent(list.this, edit.class);
 
-
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", existingFeed);
 
@@ -80,19 +60,17 @@ public class list extends Activity {
             }
         });
 
-        //plus button
+        //plus button and it will go through the edit page
         Button btnPlus = (Button) findViewById(R.id.PlusButton);
 
         btnPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Feed newFeed= new Feed(feedCount++);
-                Intent intent = new Intent ();
+                Feed newFeed = new Feed(feedCount++);
+                Intent intent = new Intent();
                 intent.setClass(list.this, edit.class);
-                //
 
                 //The Feed object is a parcelable object type so that passing data can be kept simple
-
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", newFeed);
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.editRequestCode", 0);
@@ -101,10 +79,18 @@ public class list extends Activity {
                 startActivityForResult(intent, 0);
             }
         });
+
+        //locked screen on portraity
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
-
-
+    /**
+     * This method will get the result back from edit page
+     * @param requestCode a feed will be delete if resultCode is equal to -100
+     * @param resultCode a new feed is added if resultCode is equal to 0
+     *                   a edited feed is uploaded if requestCode is equal to 1
+     * @param data it holds the details that is added by user such as start time and start date
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //TODO: Add code to update the database with new feed data

@@ -82,6 +82,16 @@ public class list extends Activity {
 
         //locked screen on portraity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        //Logout button, return to Login page
+        Button btnLogout = (Button) findViewById(R.id.tvLogout);
+        btnLogout.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
     }
 
     /**
@@ -172,6 +182,17 @@ public class list extends Activity {
             }
         }
         return false;
+    }
+
+    /**
+     * The method will be called when user clicks Logout button and it will return to Login page and
+     * clean up all activities
+     */
+    private void signOut(){
+        Intent intent = new Intent(this, login.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
 }

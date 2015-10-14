@@ -10,8 +10,21 @@
 
         android:id="@+id/Header"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:background="#8dd9b3">
+
+        <Button
+            android:id="@+id/tvLogout"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:text="Logout"
+            android:textColor="#FFF"
+            android:textAllCaps="false"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:paddingTop="20dp"/>
 
         <Button
             android:background="?android:attr/selectableItemBackground"

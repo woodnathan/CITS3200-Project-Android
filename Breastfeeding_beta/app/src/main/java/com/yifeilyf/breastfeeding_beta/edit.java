@@ -23,11 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 public class edit extends Activity {
     //Feed object to be edited
@@ -50,13 +47,16 @@ public class edit extends Activity {
 
     private int isEdit = 0; //new feed = 0, edit = 1
     private boolean ignoreWeightWarning = false;
+    private long minDate;
+    private long maxDate;
+    private boolean studyPeriodWarning = false;
 
     //Data variables
     private SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
-    private Date varStartDate;
-    private Date varEndDate;
-    private Time varStartTime;
-    private Time varEndTime;
+    private Calendar varStartDate = Calendar.getInstance();
+    private Calendar varEndDate = Calendar.getInstance();
+    //private Time varStartTime;
+    //private Time varEndTime;
     private int selectedFeedType = 0; //0,1,2 = breastfeed,expressed, supplementary
     private int selectedFeedSubType = 0; // 0,1 = left,right or expressed,suplementary
 
@@ -87,6 +87,11 @@ public class edit extends Activity {
         //Receive the feed to be edited and load current data to the UI
         Intent intent = getIntent();
 
+        //used to calculate 24 hour period warnings
+        minDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.minDate",-1);
+        maxDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
+
+
         receivedFeed = intent.getParcelableExtra("com.yifeilyf.breastfeeding_beta.newFeed");
         isEdit = intent.getIntExtra("com.yifeilyf.breastfeeding_beta.editRequestCode", 0);
         //if request code is 1 the feed can be loaded and editing disabled until edit option is selected
@@ -104,6 +109,8 @@ public class edit extends Activity {
             com.setText(receivedFeed.getComment());
             selectedFeedType = receivedFeed.getType();
             selectedFeedSubType = receivedFeed.getSubType();
+            varStartDate = receivedFeed.getStartCal();
+            varEndDate = receivedFeed.getEndCal();
 
             //initialise feed type buttons
             initFeedTypeButtons();
@@ -233,23 +240,20 @@ public class edit extends Activity {
                     //format the date into a friendly comparable format
                     String rd1 = resultDate1.getText().toString();
                     String rd2 = resultDate2.getText().toString();
-                    int d1 = Integer.parseInt(rd1.substring(6, 10) + rd1.substring(3, 5) + rd1.substring(0, 2));
-                    int d2 = Integer.parseInt(rd2.substring(6, 10) + rd2.substring(3, 5) + rd2.substring(0, 2));
+                    //int d1 = Integer.parseInt(rd1.substring(6, 10) + rd1.substring(3, 5) + rd1.substring(0, 2));
+                    //int d2 = Integer.parseInt(rd2.substring(6, 10) + rd2.substring(3, 5) + rd2.substring(0, 2));
                     double wbd = Double.parseDouble(wb.getText().toString());
                     double wad = Double.parseDouble(wa.getText().toString());
 
-
-                        Date date1 = null;
-                        Date date2 = null;
                         double time1 = Double.parseDouble(resultTime1.getText().toString().replace(':', '.'));
                         double time2 = Double.parseDouble(resultTime2.getText().toString().replace(':', '.'));
-                        //get the dates
-                        try {
-                            date1 = format.parse(resultDate1.getText().toString());
-                            date2 = format.parse(resultDate2.getText().toString());
-                        } catch (Exception e) {
-                            //do nothing
-                        }
+
+                    //used in calculating the 24 hour period warning
+                    //double dateTime = Double.parseDouble(d1+""+time1);
+
+                    //generate comparable integers for the before and after date
+                        int d1 = varStartDate.get(Calendar.YEAR)+varStartDate.get(Calendar.MONTH)+varStartDate.get(Calendar.DAY_OF_MONTH);
+                        int d2 = varEndDate.get(Calendar.YEAR)+varEndDate.get(Calendar.MONTH)+varEndDate.get(Calendar.DAY_OF_MONTH);
 
                         //start date is after end
                         if (d1 > d2) {
@@ -258,15 +262,16 @@ public class edit extends Activity {
                             validated = false;
                         }
                         //start time is after end
-                        else if (d1 == d2 && time1 > time2) {
+                        //can compare calendars because dates already validated
+                        else if (varEndDate.before(varStartDate)) {
                             validationWarning.setMessage("The finish time cannot be before the start time.");
                             validationWarning.show();
                             validated = false;
                         }
                         //same feed longer than 1 hour
-                        //include calculation for feeds over midnight
 
-                        else if (((d2 - d1) * 24) + time2 - time1 > 1) {
+
+                        else if ((varEndDate.getTimeInMillis()-varStartDate.getTimeInMillis())/3600000 > 1) {
                             validationWarning.setMessage("The feed duration cannot be longer than one hour.");
                             validationWarning.show();
                             validated = false;
@@ -305,10 +310,48 @@ public class edit extends Activity {
                             validationWarning.show();
                             validated = false;
                         }
+
+                        //warn if this feed is outside the 24h period
+                        else if(minDate != -1 && !studyPeriodWarning) {
+                            if (varStartDate.getTimeInMillis() < minDate ) {
+                                double hours = (double)(maxDate - varStartDate.getTimeInMillis()) / 3600000.0;
+                                if (hours > 23.0) {
+                                    studyPeriodWarning = true;
+                                }
+                            } else if (varStartDate.getTimeInMillis() > maxDate) {
+                                double hours = (double)(varStartDate.getTimeInMillis() - minDate) / 3600000.0;
+                                if (hours > 23.0) {
+                                    studyPeriodWarning = true;
+                                }
+                            }
+                        }
+                    //notify of period over 24 hours
+                    //give option to accept and save or cancel save and modify or cancel the feed
+                    if(studyPeriodWarning == true){
+                        validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                dialog.dismiss();
+                                saveAndReturn();
+                            }
+                        });
+                        validationWarning.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                studyPeriodWarning = false;
+                                dialog.dismiss();
+                            }
+                        });
+                        validationWarning.setMessage("The total time span for the feeds would be greater than 24 hours.");
+                        validationWarning.show();
+                        validated = false;
+                    }
+
                     }
 
                     if (validated) {
-                        saveAndReturn(v);
+                        saveAndReturn();
                     }
                 }
 
@@ -364,13 +407,15 @@ public class edit extends Activity {
             implements TimePickerDialog.OnTimeSetListener{
 
         private TextView mResultText;
+        private Calendar thisCal;
 
         public TimePickerFragment(){
             //default constructor
         }
 
-        public TimePickerFragment(TextView textView){
+        public TimePickerFragment(TextView textView, Calendar cal){
             mResultText = textView;
+            thisCal = cal;
         }
 
         public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -398,6 +443,8 @@ public class edit extends Activity {
                 minuteFixed = "0"+Integer.toString(minute);
             }
             String time = Integer.toString(hourOfDay)+":"+minuteFixed;
+            thisCal.set(Calendar.HOUR_OF_DAY,hourOfDay);
+            thisCal.set(Calendar.MINUTE,minute);
             mResultText.setText(time);
         }
 
@@ -408,8 +455,9 @@ public class edit extends Activity {
      * @param v the view of the button that is clicked
      */
     public void showTimePickerDialog1(View v){
-        DialogFragment newFragment = new TimePickerFragment(resultTime1);
+        DialogFragment newFragment = new TimePickerFragment(resultTime1,varStartDate);
         newFragment.show(getFragmentManager(), "timePicker");
+
     }
 
     /**
@@ -417,7 +465,7 @@ public class edit extends Activity {
      * @param v the view of the button that is clicked
      */
     public void showTimePickerDialog2(View v){
-        DialogFragment newFragment = new TimePickerFragment(resultTime2);
+        DialogFragment newFragment = new TimePickerFragment(resultTime2,varEndDate);
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
@@ -432,13 +480,14 @@ public class edit extends Activity {
             implements DatePickerDialog.OnDateSetListener {
 
         private TextView mResultText;
-
+        private Calendar thisCal;
         public DatePickerFragment(){
             //default constructor
         }
         //constructor
-        public DatePickerFragment(TextView textView){
+        public DatePickerFragment(TextView textView, Calendar cal){
             mResultText = textView;
+            thisCal = cal;
         }
 
         @Override
@@ -463,6 +512,7 @@ public class edit extends Activity {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
             String date = Integer.toString(day)+"/"+Integer.toString(month+1)+"/"+Integer.toString(year);
+            thisCal.set(year,month,day);
             mResultText.setText(date);
         }
     }
@@ -472,16 +522,17 @@ public class edit extends Activity {
      * @param v the view of the button that is clicked
      */
     public void showDatePickerDialog1(View v) {
-        DialogFragment newFragment = new DatePickerFragment(resultDate1);
+        DialogFragment newFragment = new DatePickerFragment(resultDate1, varStartDate);
         newFragment.show(getFragmentManager(), "datePicker");
     }
+
 
     /**
      * The method will be called when user clicks button to select a end date
      * @param v the view of the button that is clicked
      */
     public void showDatePickerDialog2(View v) {
-        DialogFragment newFragment = new DatePickerFragment(resultDate2);
+        DialogFragment newFragment = new DatePickerFragment(resultDate2,varEndDate);
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
@@ -575,9 +626,8 @@ public class edit extends Activity {
     /**
      * Function used to handle the onClick for the eventual submit button
      * This collects the data from the page, loads in into the feed object and sends it back to the calling activity
-     * @param v The view of the button that was clicked
      */
-    public void saveAndReturn(View v) {
+    public void saveAndReturn() {
         //This function assumes that all required data has been entered already
         //It will simply save and send to keep things simple
 
@@ -600,6 +650,10 @@ public class edit extends Activity {
 
         receivedFeed.putType(selectedFeedType);
         receivedFeed.putSubType(selectedFeedSubType);
+
+        //calendar stuff
+        receivedFeed.putStartCal(varStartDate);
+        receivedFeed.putEndCal(varEndDate);
 
         Intent intent = new Intent();
         intent.putExtra("com.yifeilyf.breastfeeding_beta.editedFeed", receivedFeed);

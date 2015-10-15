@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -22,6 +23,9 @@ public class Feed implements Parcelable, Comparable<Feed> {
     private double weightBefore = -1;
     private double weightAfter = -1;
     private String comment = "";
+    private Calendar startCal = Calendar.getInstance();
+    private Calendar endCal = Calendar.getInstance();
+
 
     /**
      *
@@ -62,7 +66,21 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
 
 
+    public Calendar getStartCal() {
+        return startCal;
+    }
 
+    public Calendar getEndCal() {
+        return endCal;
+    }
+
+    public void putStartCal(Calendar cal) {
+        startCal = cal;
+    }
+
+    public void putEndCal(Calendar cal){
+        endCal = cal;
+    }
 
 
     /**
@@ -184,6 +202,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         weightBefore= in.readDouble();
         weightAfter= in.readDouble();
         comment= in.readString();
+        startCal.setTimeInMillis(in.readLong());
+        endCal.setTimeInMillis(in.readLong());
 
     }
     @Override
@@ -198,6 +218,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         out.writeDouble(weightBefore);
         out.writeDouble(weightAfter);
         out.writeString(comment);
+        out.writeLong(startCal.getTimeInMillis());
+        out.writeLong(endCal.getTimeInMillis());
 
     }
 

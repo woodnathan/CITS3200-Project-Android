@@ -56,6 +56,15 @@ public class list extends Activity {
                 Feed existingFeed = (Feed) adapter.getItemAtPosition(position);
                 Intent intent = new Intent(list.this, edit.class);
 
+                //used to warn against exceeding the 24h period
+
+                if(!feedListAdapter.isEmpty()){
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.minDate",feedListAdapter.getItem(0).getStartCal().getTimeInMillis());
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate",feedListAdapter.getItem(feedListAdapter.getCount()-1).getStartCal().getTimeInMillis());
+                } else {
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.minDate", -1);
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
+                }
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", existingFeed);
 
@@ -75,6 +84,13 @@ public class list extends Activity {
                 Feed newFeed = new Feed(feedCount++);
                 Intent intent = new Intent();
                 intent.setClass(list.this, edit.class);
+                if(!feedListAdapter.isEmpty()){
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.minDate",feedListAdapter.getItem(0).getStartCal().getTimeInMillis());
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate",feedListAdapter.getItem(feedListAdapter.getCount()-1).getStartCal().getTimeInMillis());
+                } else {
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.minDate", -1);
+                    intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
+                }
 
                 //The Feed object is a parcelable object type so that passing data can be kept simple
                 //TODO: Should this naming string be a global variable

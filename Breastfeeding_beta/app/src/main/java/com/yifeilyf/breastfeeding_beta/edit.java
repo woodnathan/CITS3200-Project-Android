@@ -21,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,15 +45,17 @@ public class edit extends Activity {
 
 
     //setup UI flags and config variabls
-    private int selectedFeedType = 0; //0,1,2 = breastfeed,expressed, supplementary
-    private int selectedFeedSubType = 0; // 0,1 = left,right or expressed,suplementary
+
     private int isEdit = 0; //new feed = 0, edit = 1
 
     //Data variables
     private SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
-    private Date startDate;
-    private Date endDate;
-    private Time
+    private Date varStartDate;
+    private Date varEndDate;
+    private Time varStartTime;
+    private Time varEndTime;
+    private int selectedFeedType = 0; //0,1,2 = breastfeed,expressed, supplementary
+    private int selectedFeedSubType = 0; // 0,1 = left,right or expressed,suplementary
 
 
     @Override
@@ -96,7 +99,7 @@ public class edit extends Activity {
             resultTime2.setText(receivedFeed.getEndTime());
             EditText wb = (EditText)findViewById(R.id.btnWeight1);
             EditText wa = (EditText)findViewById(R.id.btnWeight2);
-            TextView com = (TextView)findViewById(R.id.Coments);
+            EditText com = (EditText)findViewById(R.id.Comments);
             wb.setText("" + receivedFeed.getWeightBefore());
             wa.setText("" + receivedFeed.getWeightAfter());
             com.setText(receivedFeed.getComment());
@@ -512,7 +515,7 @@ public class edit extends Activity {
 
         EditText wb = (EditText)findViewById(R.id.btnWeight1);
         EditText wa = (EditText)findViewById(R.id.btnWeight2);
-        TextView com = (TextView)findViewById(R.id.Coments);
+        EditText com = (EditText)findViewById(R.id.Comments);
 
 
         receivedFeed.putWeightBefore(Double.parseDouble(wb.getText().toString()));

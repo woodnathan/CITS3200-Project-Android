@@ -42,6 +42,10 @@ public class list extends Activity {
         feedList.setAdapter(feedListAdapter);
 
         //TODO: List can be initialised with data retrieved from the server
+        
+        //feedListAdapter.notifyDataSetChanged();
+
+
 
         //Setup the click listener for the feed list, to allow for editing
         feedList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

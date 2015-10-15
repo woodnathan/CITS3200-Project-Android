@@ -299,7 +299,7 @@
                 android:maxLines="4"
                 android:hint="@string/Coments"
                 android:layout_marginBottom="20dp"
-                />
+                android:id="@+id/Comments" />
         </RelativeLayout>
 
     </ScrollView>

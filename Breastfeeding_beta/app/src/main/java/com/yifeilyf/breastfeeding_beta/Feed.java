@@ -3,17 +3,20 @@ package com.yifeilyf.breastfeeding_beta;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Josh on 20/09/2015.
  * Data object to record feeds
  */
-public class Feed implements Parcelable {
+public class Feed implements Parcelable, Comparable<Feed> {
 
     private int ID;
     private String startDate = "";
     private String endDate = "";
     private String startTime = "";
-    private String endTime =  "";
+    private String endTime = "";
     private int type = -1; //(0,1,2) breastfeed expressed supplementary
     private int subType = -1; // (0,1) left,right or expressed,supplementary
     private double weightBefore = -1;
@@ -27,6 +30,39 @@ public class Feed implements Parcelable {
     public Feed(int ID) {
         this.ID = ID;
     }
+
+    //compares based on start date
+    public int compareTo(Feed f) {
+        //if same date
+        if (f.getStartDate().equals(getStartDate())) {
+            //compare time
+            String ft = f.getStartTime();
+            String tt = getStartTime();
+            ft = ft.replace(':','.');
+            tt = tt.replace(':','.');
+            double thisTime = Double.parseDouble(tt);
+            double fTime = Double.parseDouble(ft);
+            return Double.compare(thisTime, fTime);
+        } else {
+            //compare dates
+            SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+            try {
+                Date fDate = format.parse(f.getStartDate());
+                Date thisDate = format.parse(getStartDate());
+                return thisDate.compareTo(fDate);
+            } catch (Exception e) {
+                //do nothing
+            }
+
+        }
+        //something went wrong assume equal
+        return 0;
+    }
+
+
+
+
+
 
 
     /**

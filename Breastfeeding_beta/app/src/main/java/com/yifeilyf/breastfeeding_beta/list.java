@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class list extends Activity {
 
@@ -40,6 +41,7 @@ public class list extends Activity {
         feedListAdapter = new ArrayAdapter<Feed>(this,
                 android.R.layout.simple_list_item_1,feedBackingArray);
         feedList.setAdapter(feedListAdapter);
+
 
         //TODO: List can be initialised with data retrieved from the server
 
@@ -108,24 +110,30 @@ public class list extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //TODO: Add code to update the database with new feed data
-        //TODO: Make the list sort by date/time
+
         //requestCode is the identifier sent to the edit activity, 0=newFeed 1=editFeed
         Feed editedFeed = data.getParcelableExtra("com.yifeilyf.breastfeeding_beta.editedFeed");
         if (resultCode == -100) {
             //TODO: delete feed
             deleteFeed(editedFeed);
-            feedListAdapter.notifyDataSetChanged();
         } else if(resultCode != RESULT_CANCELED) {
             if(requestCode == 0) {
                 //TODO Error handling?
                 addNewFeed(editedFeed);
-                feedListAdapter.notifyDataSetChanged();
             } else if(requestCode == 1) {
                 //TODO Error handling?
                 updateFeed(editedFeed);
-                feedListAdapter.notifyDataSetChanged();
             }
         }
+
+        //sort and update the list
+        feedListAdapter.sort(new Comparator<Feed>() {
+            @Override
+            public int compare(Feed lhs, Feed rhs) {
+                return lhs.compareTo(rhs);
+            }
+        });
+        feedListAdapter.notifyDataSetChanged();
     }
 
     /**

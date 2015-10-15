@@ -11,8 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
-import android.text.InputType;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
 import android.view.View;
@@ -130,11 +128,11 @@ public class edit extends Activity {
 
         //Cancel button, return to list page when it is clicked
         Button btnCancel = (Button) findViewById(R.id.CancelButton);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+        btnCancel.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), list.class);
                 //result cancelled tells the list page not to change the list or feeds
-                setResult(Activity.RESULT_CANCELED, intent);
+                setResult(Activity.RESULT_CANCELED,intent);
                 finish();
             }
         });
@@ -143,36 +141,25 @@ public class edit extends Activity {
         //Done Button, pass data to a TextView
         final Button btnDone = (Button) findViewById(R.id.DoneButton);
 
-<<<<<<< HEAD
-        btnDone.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //TODO: Add checks to ensure all data has been entered.
-                //TODO: data validation checks need to be added as well
-=======
         btnDone.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
->>>>>>> origin/master
 
                 //Calls function to save all data to the feed and return it to the list screen
                 //if a feed is being edited
-                if (isEdit == 1) {
+                if(isEdit == 1){
                     isEdit = 0; //set isEdit to 0 so that code runs as if it is a new feed
                     Button delete = (Button) findViewById(R.id.btnDelete);
                     delete.setVisibility(View.VISIBLE);
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.edit);
-                    for (int i = 0; i < layout.getChildCount(); i++) {
+                    for(int i = 0; i<layout.getChildCount(); i++){
                         View edit = layout.getChildAt(i);
-                        if (edit instanceof Button) {
-                            ((Button) edit).setEnabled(true);
-                        } else if (edit instanceof EditText) {
-                            ((EditText) edit).setEnabled(true);
+                        if(edit instanceof Button){
+                            ((Button)edit).setEnabled(true);
+                        } else if(edit instanceof EditText){
+                            ((EditText)edit).setEnabled(true);
                         }
                     }
                     btnDone.setText("Done");
-<<<<<<< HEAD
-                } else {
-                    saveAndReturn(v);
-=======
                 }else{
 
                     //TODO: Add checks to ensure all data has been entered.
@@ -264,7 +251,6 @@ public class edit extends Activity {
                     if(validated) {
                         saveAndReturn(v);
                     }
->>>>>>> origin/master
                 }
             }
         });
@@ -281,17 +267,9 @@ public class edit extends Activity {
                 return false;
             }
         });
-
-        //
-        /*EditText weightBefore = (EditText) findViewById(R.id.btnWeight1);
-        weightBefore.setInputType(InputType.TYPE_CLASS_NUMBER);
-        EditText weightAfter = (EditText) findViewById(R.id.btnWeight2);
-        weightAfter.setInputType(InputType.TYPE_CLASS_NUMBER);*/
     }
 
     public void deleteFeed(View v) {
-        //TODO: add conformation popup
-        //if yes
         AlertDialog.Builder alertIfDelete = new AlertDialog.Builder(this);
         alertIfDelete.setTitle("Alert!!");
         alertIfDelete.setMessage("Are you sure to delete this feed");
@@ -313,11 +291,6 @@ public class edit extends Activity {
         });
 
         alertIfDelete.show();
-        /*Intent intent = new Intent();
-        intent.putExtra("com.yifeilyf.breastfeeding_beta.editedFeed", receivedFeed);
-        setResult(-100, intent);
-        finish();*/
-
     }
 
     //set Time picker

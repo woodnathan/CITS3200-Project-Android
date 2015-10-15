@@ -42,7 +42,7 @@ public class list extends Activity {
         feedList.setAdapter(feedListAdapter);
 
         //TODO: List can be initialised with data retrieved from the server
-        
+
         //feedListAdapter.notifyDataSetChanged();
 
 

@@ -413,8 +413,7 @@ public class edit extends Activity {
      * and background on the clicked button
      * @param v The view of the button that is clicked
      */
-    Button btnType;// , btnLeftFeedType, btnRightFeedType;
-    //TextView FeedType;
+
 
     public void onClick(View v){
         //Clear all buttons
@@ -466,7 +465,7 @@ public class edit extends Activity {
      * it will set focusable and background on the clicked button
      * @param v the view of the button that is clicked
      */
-    Button btnBreast;
+
 
     public void onClickBreast(View v){
         btnLeftFeedType.setBackgroundResource(R.drawable.textview_border);

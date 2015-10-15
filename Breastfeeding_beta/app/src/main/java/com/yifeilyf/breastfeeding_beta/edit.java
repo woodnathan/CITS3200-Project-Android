@@ -20,7 +20,11 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class edit extends Activity {
     //Feed object to be edited
@@ -29,9 +33,26 @@ public class edit extends Activity {
     //Setup UI interfaces
     private TextView resultTime1, resultTime2;
     private TextView resultDate1, resultDate2;
+    private TextView FeedType;
+    private Button btnLeftFeedType;
+    private Button btnRightFeedType;
+    private Button btnFeedBreast;
+    private Button btnFeedExpressed;
+    private Button btnFeedSupplement;
+
+
+
+
+    //setup UI flags and config variabls
     private int selectedFeedType = 0; //0,1,2 = breastfeed,expressed, supplementary
     private int selectedFeedSubType = 0; // 0,1 = left,right or expressed,suplementary
     private int isEdit = 0; //new feed = 0, edit = 1
+
+    //Data variables
+    private SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+    private Date startDate;
+    private Date endDate;
+    private Time
 
 
     @Override
@@ -50,6 +71,14 @@ public class edit extends Activity {
         resultTime2 = (TextView) findViewById(R.id.SelectTime2);
         resultDate1 = (TextView) findViewById(R.id.SelectDate1);
         resultDate2 = (TextView) findViewById(R.id.SelectDate2);
+
+        FeedType = (TextView) findViewById(R.id.Breast);
+        btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
+        btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
+
+        btnFeedBreast = (Button) findViewById(R.id.btnType1);
+        btnFeedExpressed = (Button) findViewById(R.id.btnType3);
+        btnFeedSupplement = (Button) findViewById(R.id.btnType2);
 
         //Receive the feed to be edited and load current data to the UI
         Intent intent = getIntent();
@@ -109,8 +138,6 @@ public class edit extends Activity {
 
         btnDone.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                //TODO: Add checks to ensure all data has been entered.
-                //TODO: data validation checks need to be added as well
 
                 //Calls function to save all data to the feed and return it to the list screen
                 //if a feed is being edited
@@ -129,7 +156,96 @@ public class edit extends Activity {
                     }
                     btnDone.setText("Done");
                 }else{
-                    saveAndReturn(v);
+
+                    //TODO: Add checks to ensure all data has been entered.
+                    //TODO: data validation checks need to be added as well
+                    boolean validated = true;
+                    /**
+                     * First test all fields are complete
+                     * Then check data validations
+                     */
+                    //date1
+                    //is empty
+                    if(resultDate1.getText().length() == 0) {
+                        resultDate1.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+
+                    //date2
+                    //is empty
+                    if(resultDate2.getText().length() == 0){
+                        resultDate2.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+                    //start time
+                    //is empty
+                    if(resultTime1.getText().length() == 0){
+                        resultTime1.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+                    //end time
+                    //is empty
+                    if(resultTime2.getText().length() == 0){
+                        resultTime2.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+                    //weight before
+                    //is empty
+                    EditText wb = (EditText)findViewById(R.id.btnWeight1);
+                    if(wb.getText().toString().length() == 0){
+                        wb.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+                    //weight after
+                    //is empty
+
+                    EditText wa = (EditText)findViewById(R.id.btnWeight2);
+                    if(wa.getText().toString().length() == 0){
+                        wa.setError(getString(R.string.error_field_required));
+                        validated = false;
+                    }
+
+
+                    /**
+                     * VALIDATE DATA
+                     * Only enters this section if all data is entered
+                     */
+                if(validated) {
+
+                    try {
+                        Date date1 = format.parse(resultDate1.getText().toString());
+                        Date date2 = format.parse(resultDate2.getText().toString());
+                        if (date1.after(date2)) {
+                            resultDate2.setError("Finish date is before start date.");
+                            validated = false;
+                        }
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                    //start time
+                    //is empty
+                    if (resultTime1.getText().length() == 0) {
+
+                    }
+                    //end time
+                    //is empty
+                    if (resultTime2.getText().length() == 0) {
+
+                    }
+                    //weight before
+                    //is empty
+                    double wbd = Double.parseDouble(wb.getText().toString());
+                    double wad = Double.parseDouble(wa.getText().toString());
+                    if (wbd > wad) {
+                        wa.setError("Weight after is less than before.");
+                        validated = false;
+                    }
+
+                }
+
+                    if(validated) {
+                        saveAndReturn(v);
+                    }
                 }
             }
         });
@@ -195,7 +311,13 @@ public class edit extends Activity {
          */
         public void onTimeSet(TimePicker view, int hourOfDay, int minute){
             //pass value to mResultText
-            String time = Integer.toString(hourOfDay)+":"+Integer.toString(minute);
+
+            //fix minutes less than 10
+            String minuteFixed = Integer.toString(minute);
+            if(Integer.toString(minute).length() == 1) {
+                minuteFixed = "0"+Integer.toString(minute);
+            }
+            String time = Integer.toString(hourOfDay)+":"+minuteFixed;
             mResultText.setText(time);
         }
 
@@ -288,72 +410,53 @@ public class edit extends Activity {
      * and background on the clicked button
      * @param v The view of the button that is clicked
      */
-    Button btnType, btnLeftFeedType, btnRightFeedType;
-    TextView FeedType;
+    Button btnType;// , btnLeftFeedType, btnRightFeedType;
+    //TextView FeedType;
 
     public void onClick(View v){
+        //Clear all buttons
+        //Set new focus button
+        btnFeedBreast.setBackgroundResource(R.drawable.textview_border);
+        btnFeedExpressed.setBackgroundResource(R.drawable.textview_border);
+        btnFeedSupplement.setBackgroundResource(R.drawable.textview_border);
+
+
         switch (v.getId()){
             //type breastfeed
             case R.id.btnType1:
                 //used to set value in feed object
                 selectedFeedType = 0;
-                if(btnType == null){ //Breastfeed layout
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                } else if(btnType != findViewById(v.getId())) {
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                }
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedBreast.setBackgroundResource(R.drawable.btn1);
+
                 FeedType.setText("Breastfeed Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Left");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Right");
                 break;
 
-            //type expressed
+            //type supplementary
             case R.id.btnType2:
                 //used to set value in feed object
                 selectedFeedType = 2;
-                if(btnType == null){ //Supplementary layout
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                } else if(btnType != findViewById(v.getId())) {
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                }
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedSupplement.setBackgroundResource(R.drawable.btn1);
+
                 FeedType.setText("Supplementary Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Expressed");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Formula");
                 break;
 
-            //type supplementary
+            //type expressed
             case R.id.btnType3:
                 //used to set value in feed object
                 selectedFeedType = 1;
-                if(btnType == null){ //Expressed layout
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                } else if(btnType != findViewById(v.getId())){
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-                    btnType = (Button) findViewById(v.getId());
-                    btnType.setBackgroundResource(R.drawable.btn1);
-                }
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedExpressed.setBackgroundResource(R.drawable.btn1);
+
                 FeedType.setText("Expressed Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Left");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Right");
                 break;
         }
     }
+
 
     /**
      * This method will be called when user try to select subtype of breast type and
@@ -363,30 +466,19 @@ public class edit extends Activity {
     Button btnBreast;
 
     public void onClickBreast(View v){
+        btnLeftFeedType.setBackgroundResource(R.drawable.textview_border);
+        btnRightFeedType.setBackgroundResource(R.drawable.textview_border);
+
         switch (v.getId()){
             case R.id.btnBreast1:
                 //used to set value in feed object
                 selectedFeedSubType = 0;
-                if(btnBreast == null){
-                    btnBreast = (Button) findViewById(v.getId());
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-                } else if(btnBreast != findViewById(v.getId())) {
-                    btnBreast.setBackgroundResource(R.drawable.textview_border);
-                    btnBreast = (Button) findViewById(v.getId());
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-                }
+                btnLeftFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
 
             case R.id.btnBreast2:
                 selectedFeedSubType = 1;
-                if(btnBreast == null){
-                    btnBreast = (Button) findViewById(v.getId());
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-                } else if(btnBreast != findViewById(v.getId())) {
-                    btnBreast.setBackgroundResource(R.drawable.textview_border);
-                    btnBreast = (Button) findViewById(v.getId());
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-                }
+                btnRightFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
         }
     }
@@ -421,10 +513,6 @@ public class edit extends Activity {
         EditText wb = (EditText)findViewById(R.id.btnWeight1);
         EditText wa = (EditText)findViewById(R.id.btnWeight2);
         TextView com = (TextView)findViewById(R.id.Coments);
-        //TODO: assign Type 0,1,2 = breastfeed,expressed,supplementary
-        receivedFeed.putType(1);
-        //TODO: assign SubType 0,1 = left,right or expressed,supplementary
-        receivedFeed.putSubType(1);
 
 
         receivedFeed.putWeightBefore(Double.parseDouble(wb.getText().toString()));
@@ -448,47 +536,23 @@ public class edit extends Activity {
         //setup feed type buttons
         switch (selectedFeedType){
             case 0:
-
-
-                    btnType = (Button) findViewById(R.id.btnType1);
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-                    btnType.setBackgroundResource(R.drawable.btn1);
-
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedBreast.setBackgroundResource(R.drawable.btn1);
                 FeedType.setText("Breastfeed Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Left");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Right");
                 break;
 
             case 2:
-
-                    btnType = (Button) findViewById(R.id.btnType2);
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-
-                    btnType.setBackgroundResource(R.drawable.btn1);
-
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedSupplement.setBackgroundResource(R.drawable.btn1);
                 FeedType.setText("Supplementary Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Expressed");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Formula");
                 break;
 
             case 1:
-
-                    btnType = (Button) findViewById(R.id.btnType3);
-                    btnType.setBackgroundResource(R.drawable.textview_border);
-
-                    btnType.setBackgroundResource(R.drawable.btn1);
-
-                FeedType = (TextView) findViewById(R.id.Breast);
+                btnFeedExpressed.setBackgroundResource(R.drawable.btn1);
                 FeedType.setText("Expressed Type");
-                btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
                 btnLeftFeedType.setText("Left");
-                btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
                 btnRightFeedType.setText("Right");
                 break;
     }
@@ -496,20 +560,11 @@ public class edit extends Activity {
         //Setup sub type buttons
         switch (selectedFeedSubType){
             case 0:
-
-                    btnBreast = (Button) findViewById(R.id.btnBreast1);
-                    btnBreast.setBackgroundResource(R.drawable.textview_border);
-
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-
+                btnLeftFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
 
             case 1:
-                    btnBreast = (Button) findViewById(R.id.btnBreast2);
-                    btnBreast.setBackgroundResource(R.drawable.textview_border);
-
-                    btnBreast.setBackgroundResource(R.drawable.btn1);
-
+                btnRightFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
         }
     }

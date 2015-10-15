@@ -264,8 +264,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/WeightBefore"
                 android:background="@drawable/textview_border"
-                android:inputType="phone"
-                />
+                android:inputType="number" />
 
             <EditText
                 android:id="@+id/btnWeight2"
@@ -279,7 +278,7 @@
                 android:layout_below="@+id/WeightAfter"
                 android:background="@drawable/textview_border"
                 android:padding="7dp"
-                android:inputType="phone"/>
+                android:inputType="number" />
 
             <TextView
                 android:id="@+id/Coments"
@@ -310,8 +309,8 @@
         android:layout_height="wrap_content"
         android:text="Delete"
         android:id="@+id/btnDelete"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_marginTop="500dp"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="25dp"
         android:layout_marginBottom="5dp"
         android:visibility="invisible"

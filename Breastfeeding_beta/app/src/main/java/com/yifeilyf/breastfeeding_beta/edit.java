@@ -49,6 +49,7 @@ public class edit extends Activity {
     //setup UI flags and config variabls
 
     private int isEdit = 0; //new feed = 0, edit = 1
+    private boolean ignoreWeightWarning = false;
 
     //Data variables
     private SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
@@ -63,14 +64,12 @@ public class edit extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //remove notification bar
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //set content view after above sequence (to avoid crash)
+
         this.setContentView(R.layout.edit);
         setContentView(R.layout.edit);
 
+        //Assign views to UI interface variables
         //Timepicker and Datepicker shows on TextView
         resultTime1 = (TextView) findViewById(R.id.SelectTime1);
         resultTime2 = (TextView) findViewById(R.id.SelectTime2);
@@ -92,8 +91,6 @@ public class edit extends Activity {
         isEdit = intent.getIntExtra("com.yifeilyf.breastfeeding_beta.editRequestCode", 0);
         //if request code is 1 the feed can be loaded and editing disabled until edit option is selected
         if(isEdit == 1){
-            //TODO: DISABLE EDITING OF PAGE
-
             //load saved feed details to the page
             resultDate1.setText(receivedFeed.getStartDate());
             resultDate2.setText(receivedFeed.getEndDate());
@@ -124,6 +121,9 @@ public class edit extends Activity {
                     ((EditText)edit).setEnabled(false);
                 }
             }
+        } else {
+            //initialise the feed type buttons with default settings
+            initFeedTypeButtons();
         }
 
         //Cancel button, return to list page when it is clicked
@@ -162,9 +162,23 @@ public class edit extends Activity {
                     btnDone.setText("Done");
                 }else{
 
-                    //TODO: Add checks to ensure all data has been entered.
+
                     //TODO: data validation checks need to be added as well
                     boolean validated = true;
+                    EditText wb = (EditText)findViewById(R.id.btnWeight1);
+                    EditText wa = (EditText)findViewById(R.id.btnWeight2);
+
+                    //setup warning prompt
+                    AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
+                    validationWarning.setTitle("Invalid Input");
+                    //validationWarning.setMessage("");
+                    validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
                     /**
                      * First test all fields are complete
                      * Then check data validations
@@ -178,34 +192,34 @@ public class edit extends Activity {
 
                     //date2
                     //is empty
-                    if(resultDate2.getText().length() == 0){
+                    else if(resultDate2.getText().length() == 0){
                         resultDate2.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //start time
                     //is empty
-                    if(resultTime1.getText().length() == 0){
+                    else if(resultTime1.getText().length() == 0){
                         resultTime1.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //end time
                     //is empty
-                    if(resultTime2.getText().length() == 0){
+                    else if(resultTime2.getText().length() == 0){
                         resultTime2.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //weight before
                     //is empty
-                    EditText wb = (EditText)findViewById(R.id.btnWeight1);
-                    if(wb.getText().toString().length() == 0){
+
+                    else if(wb.getText().toString().length() == 0){
                         wb.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //weight after
                     //is empty
 
-                    EditText wa = (EditText)findViewById(R.id.btnWeight2);
-                    if(wa.getText().toString().length() == 0){
+
+                    else if(wa.getText().toString().length() == 0){
                         wa.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
@@ -216,42 +230,89 @@ public class edit extends Activity {
                      * Only enters this section if all data is entered
                      */
                 if(validated) {
-
-                    try {
-                        Date date1 = format.parse(resultDate1.getText().toString());
-                        Date date2 = format.parse(resultDate2.getText().toString());
-                        if (date1.after(date2)) {
-                            resultDate2.setError("Finish date is before start date.");
-                            validated = false;
-                        }
-                    } catch (Exception e) {
-                        //do nothing
-                    }
-                    //start time
-                    //is empty
-                    if (resultTime1.getText().length() == 0) {
-
-                    }
-                    //end time
-                    //is empty
-                    if (resultTime2.getText().length() == 0) {
-
-                    }
-                    //weight before
-                    //is empty
+                    //format the date into a friendly comparable format
+                    String rd1 = resultDate1.getText().toString();
+                    String rd2 = resultDate2.getText().toString();
+                    int d1 = Integer.parseInt(rd1.substring(6, 10) + rd1.substring(3, 5) + rd1.substring(0, 2));
+                    int d2 = Integer.parseInt(rd2.substring(6, 10) + rd2.substring(3, 5) + rd2.substring(0, 2));
                     double wbd = Double.parseDouble(wb.getText().toString());
                     double wad = Double.parseDouble(wa.getText().toString());
-                    if (wbd > wad) {
-                        wa.setError("Weight after is less than before.");
-                        validated = false;
+
+
+                        Date date1 = null;
+                        Date date2 = null;
+                        double time1 = Double.parseDouble(resultTime1.getText().toString().replace(':', '.'));
+                        double time2 = Double.parseDouble(resultTime2.getText().toString().replace(':', '.'));
+                        //get the dates
+                        try {
+                            date1 = format.parse(resultDate1.getText().toString());
+                            date2 = format.parse(resultDate2.getText().toString());
+                        } catch (Exception e) {
+                            //do nothing
+                        }
+
+                        //start date is after end
+                        if (d1 > d2) {
+                            validationWarning.setMessage("The finish date cannot be before the start date.");
+                            validationWarning.show();
+                            validated = false;
+                        }
+                        //start time is after end
+                        else if (d1 == d2 && time1 > time2) {
+                            validationWarning.setMessage("The finish time cannot be before the start time.");
+                            validationWarning.show();
+                            validated = false;
+                        }
+                        //same feed longer than 1 hour
+                        //include calculation for feeds over midnight
+
+                        else if (((d2 - d1) * 24) + time2 - time1 > 1) {
+                            validationWarning.setMessage("The feed duration cannot be longer than one hour.");
+                            validationWarning.show();
+                            validated = false;
+                        }
+                        //expression cannot be lower after
+                        else if(selectedFeedType == 1 && wbd > wad){
+                            validationWarning.setMessage("The weight after expression cannot be lower than the weight before.");
+                            validationWarning.show();
+                            validated = false;
+
+                        }
+                        //Weight after is more than 20g lower
+                        else if (wbd - wad > 0 && wbd - wad <= 20 && !ignoreWeightWarning) {
+                            validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ignoreWeightWarning = true;
+                                    dialog.dismiss();
+                                }
+                            });
+                            validationWarning.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ignoreWeightWarning = false;
+                                    dialog.dismiss();
+                                }
+                            });
+                            validationWarning.setMessage("The weight after is lower than the weight before, press OK to ignore this warning.");
+                            validationWarning.show();
+                            validated = false;
+                        }
+                        //weight is more than 20g less
+                        else if (wbd - wad > 20) {
+                            ignoreWeightWarning = false; //reset this warning to ensure the correct value is entered
+                            validationWarning.setMessage("The weight after is more than 20g lower than the weight before.");
+                            validationWarning.show();
+                            validated = false;
+                        }
                     }
 
-                }
-
-                    if(validated) {
+                    if (validated) {
                         saveAndReturn(v);
                     }
                 }
+
+
             }
         });
 

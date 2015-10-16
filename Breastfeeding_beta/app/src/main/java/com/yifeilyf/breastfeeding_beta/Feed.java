@@ -195,8 +195,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         out.writeString(endTime);
         out.writeInt(type);
         out.writeInt(subType);
-        out.writeDouble(weightBefore);
-        out.writeDouble(weightAfter);
+        out.writeInt(weightBefore);
+        out.writeInt(weightAfter);
         out.writeString(comment);
         out.writeLong(startCal.getTimeInMillis());
         out.writeLong(endCal.getTimeInMillis());

@@ -19,6 +19,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -164,7 +168,7 @@ public class login extends Activity{
      */
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.length() > 3;
+        return email.length() > 0;
     }
 
     /**
@@ -174,7 +178,7 @@ public class login extends Activity{
      */
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 3;
+        return password.length() > 0;
     }
 
     /**
@@ -235,6 +239,7 @@ public class login extends Activity{
 
         private final String mEmail;
         private final String mPassword;
+        private String feedData;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -249,7 +254,7 @@ public class login extends Activity{
                 // Simulate network access.
                 //Thread.sleep(2000);
                 System.out.println("Starting doInBackground.");
-                URL url = new URL("http://hhlrg.woodnathan.com/milk/api/api.php?_action=user_info");
+                URL url = new URL("https://breastfeeding.bcs.uwa.edu.au/milk/api/api.php?_action=user_info");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {
                     System.out.println("Starting connection.");
@@ -263,9 +268,10 @@ public class login extends Activity{
                     urlConnection.setDoOutput(true);
                     //urlConnection.setChunkedStreamingMode(0);
 
-                    OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
+                    //OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
                     //InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                     StringBuilder sb = new StringBuilder();
+                    JSONObject jsonObject = new JSONObject();
                     int HttpResult = urlConnection.getResponseCode();
                     if(HttpResult == HttpURLConnection.HTTP_OK){
                         BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
@@ -276,37 +282,59 @@ public class login extends Activity{
 
                         br.close();
 
-                        System.out.println("Received: "+sb.toString());
-
+                        System.out.println("Received: " + sb.toString());
+                        jsonObject = new JSONObject(sb.toString());
+                        sb = new StringBuilder();
                     }else{
                         System.out.println(urlConnection.getResponseMessage());
                     }
 
                     if (sb.toString().contains("error")) {
+                        System.out.print("Error ");
+                        System.out.println(jsonObject.getJSONObject("code"));
+                        System.out.println(jsonObject.getJSONObject("message"));
                         return false;
-                    }
+                    } else {
+                        urlConnection.disconnect();
+                        url = new URL("http://hhlrg.woodnathan.com/milk/api/api.php?_action=get_feeds");
+                        urlConnection = (HttpURLConnection) url.openConnection();
+                        System.out.println("Starting get_feeds.");
 
+                        urlConnection.setRequestMethod("POST");
+                        urlConnection.setRequestProperty("Content-Type", "application/json");
+                        urlConnection.setRequestProperty("Accept", "application/json");
+                        urlConnection.setRequestProperty("X-Mother-Username", mEmail);
+                        urlConnection.setRequestProperty("X-Mother-Password", mPassword);
+                        urlConnection.setDoInput(true);
+                        urlConnection.setDoOutput(true);
+
+                        HttpResult = urlConnection.getResponseCode();
+                        if(HttpResult == HttpURLConnection.HTTP_OK){
+                            BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
+                            String line = null;
+                            while ((line = br.readLine()) != null) {
+                                sb.append(line + "\n");
+                            }
+
+                            br.close();
+
+                            System.out.println("Received: " + sb.toString());
+                            feedData = sb.toString();
+                        } else {
+                            System.out.println(urlConnection.getResponseMessage());
+                        }
+                    }
                 } finally {
                     urlConnection.disconnect();
                 }
 
-            } /*catch (InterruptedException e) {
-                return false;
-            }*/ catch (MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 return false;
             } catch (IOException e) {
                 return false;
-            } /*catch (JSONException e) {
+            } catch (JSONException e) {
                 return false;
-            }*/
-
-            /*for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }*/
+            }
 
             // TODO: register the new account here.
             return true;
@@ -323,6 +351,9 @@ public class login extends Activity{
 
             if (success) {
                 Intent intent = new Intent(login.this, list.class);
+                intent.putExtra("mEmail", mEmail);
+                intent.putExtra("mPassword", mPassword);
+                intent.putExtra("feedData", feedData);
                 startActivity(intent);
                 finish();
             } else {

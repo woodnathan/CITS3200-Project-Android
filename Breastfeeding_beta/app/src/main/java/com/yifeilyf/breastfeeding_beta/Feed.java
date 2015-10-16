@@ -38,29 +38,25 @@ public class Feed implements Parcelable, Comparable<Feed> {
     //compares based on start date
     public int compareTo(Feed f) {
         //if same date
-        if (f.getStartDate().equals(getStartDate())) {
+        if (f.getStartCal().get(Calendar.DAY_OF_YEAR) == (getStartCal().get(Calendar.DAY_OF_YEAR))) {
             //compare time
-            String ft = f.getStartTime();
-            String tt = getStartTime();
-            ft = ft.replace(':','.');
-            tt = tt.replace(':','.');
-            double thisTime = Double.parseDouble(tt);
-            double fTime = Double.parseDouble(ft);
-            return Double.compare(thisTime, fTime);
+            int ft = f.getStartCal().get(Calendar.HOUR_OF_DAY) * 60 + f.getStartCal().get(Calendar.MINUTE);
+            int tt = getStartCal().get(Calendar.HOUR_OF_DAY) * 60 + f.getStartCal().get(Calendar.MINUTE);
+            return Integer.compare(tt, ft);
         } else {
             //compare dates
-            SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+            /*SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
             try {
                 Date fDate = format.parse(f.getStartDate());
                 Date thisDate = format.parse(getStartDate());
                 return thisDate.compareTo(fDate);
             } catch (Exception e) {
                 //do nothing
-            }
-
+            }*/
+            return Integer.compare(getStartCal().get(Calendar.DAY_OF_YEAR),f.getStartCal().get(Calendar.DAY_OF_YEAR));
         }
         //something went wrong assume equal
-        return 0;
+        //return 0;
     }
 
 
@@ -76,6 +72,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
     public void putStartCal(Calendar cal) {
         startCal = cal;
+
     }
 
     public void putEndCal(Calendar cal){
@@ -131,6 +128,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
+     * @param type
      */
     public void putType(int type) {this.type = type;}
     /**
@@ -141,6 +139,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
+     * @param type
      */
     public void putSubType(int type) {subType = type;}
     /**

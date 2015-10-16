@@ -14,10 +14,6 @@ import java.util.Date;
 public class Feed implements Parcelable, Comparable<Feed> {
 
     private int ID;
-    private String startDate = "";
-    private String endDate = "";
-    private String startTime = "";
-    private String endTime = "";
     private int type = -1; //(0,1,2) breastfeed expressed supplementary
     private int subType = -1; // (0,1) left,right or expressed,supplementary
     private int weightBefore = -1;
@@ -26,81 +22,56 @@ public class Feed implements Parcelable, Comparable<Feed> {
     private Calendar startCal = Calendar.getInstance();
     private Calendar endCal = Calendar.getInstance();
 
+    private SimpleDateFormat formatDateTime = new SimpleDateFormat("dd/MM/yyyy  HH:mm");
+    //displays as below
+    //    16/21/2015  13:21
+    //    16/21/2015  03:21
+
 
     /**
-     *
-     *
+     * Creates a feed with no data.
+     * @param ID Unique ID to assign to this feed object
      */
     public Feed(int ID) {
         this.ID = ID;
     }
 
-    //compares based on start date
     public int compareTo(Feed f) {
         return startCal.compareTo(f.getStartCal());
     }
 
 
-
-
+    /**
+     * Get start time of feed
+     * @return
+     */
     public Calendar getStartCal() {
         return startCal;
     }
-
+    /**
+     * Get end time of feed
+     * @return
+     */
     public Calendar getEndCal() {
         return endCal;
     }
-
+    /**
+     * Overwrite the current start date and time
+     * @param cal calender object to write to the feed
+     */
     public void putStartCal(Calendar cal) {
         startCal = cal;
-
     }
-
+    /**
+     *Overwrite the current end date and time
+     * @param cal calender object to write to the feed
+     */
     public void putEndCal(Calendar cal){
         endCal = cal;
     }
 
 
-    /**
-     *
-     * @return
-     */
-    public String getStartDate() {return startDate;}
-    /**
-     *
-     * @return
-     */
-    public void putStartDate(String date) {startDate = date;}
-    /**
-     *
-     * @return
-     */
-    public String getEndDate() {return endDate;}
-    /**
-     *
-     * @return
-     */
-    public void putEndDate(String date) {endDate = date;}
-    /**
-     *
-     * @return
-     */
-    public String getStartTime() {return startTime;}
-    /**
-     *
-     * @return
-     */
-    public void putStartTime(String time) {startTime = time;}
-    /**
-     *
-     * @return
-     */
-    public String getEndTime() {return endTime;}
-    /**
-     *
-     * @return
-     */
-    public void putEndTime(String time) {endTime = time;}
+
     /**
      *
      * @return
@@ -109,7 +80,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
-     * @param type
      */
     public void putType(int type) {this.type = type;}
     /**
@@ -120,7 +90,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
-     * @param type
      */
     public void putSubType(int type) {subType = type;}
     /**
@@ -161,8 +130,11 @@ public class Feed implements Parcelable, Comparable<Feed> {
     public int getID(){return ID;}
 
 
-    public String toString() {
+   /* public String toString() {
         return getStartDate() + " " + getStartTime();
+    }*/
+    public String toString(){
+        return formatDateTime.format(getStartCal().getTime());
     }
 
 
@@ -173,10 +145,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
     private Feed(Parcel in) {
         ID = in.readInt();
-        startDate = in.readString();
-        endDate = in.readString();
-        startTime= in.readString();
-        endTime= in.readString();
         type= in.readInt();
         subType= in.readInt();
         weightBefore= in.readInt();
@@ -189,10 +157,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeInt(ID);
-        out.writeString(startDate);
-        out.writeString(endDate);
-        out.writeString(startTime);
-        out.writeString(endTime);
         out.writeInt(type);
         out.writeInt(subType);
         out.writeInt(weightBefore);

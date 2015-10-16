@@ -339,20 +339,6 @@ public class list extends Activity {
                 endCal.setTime(sdf.parse(data.getJSONObject("after").getString("date")));
                 feed.putEndCal(endCal);
 
-                sdf = new SimpleDateFormat("dd/MM/yyyy");
-                String startDate = sdf.format(startCal.getTime());
-                feed.putStartDate(startDate);
-
-                String endDate = sdf.format(endCal.getTime());
-                feed.putEndDate(endDate);
-
-                sdf = new SimpleDateFormat("HH:mm");
-                String startTime = sdf.format(startCal.getTime());
-                feed.putStartTime(startTime);
-
-                String endTime = sdf.format(endCal.getTime());
-                feed.putEndTime(endTime);
-
                 //Add weights
                 feed.putWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
                 System.out.println(data.getJSONObject("before").getString("weight"));

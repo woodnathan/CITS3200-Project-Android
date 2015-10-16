@@ -348,7 +348,7 @@ public class list extends Activity {
 
                 sdf = new SimpleDateFormat("HH:mm");
                 String startTime = sdf.format(startCal.getTime());
-                feed.putStartTime(startDate);
+                feed.putStartTime(startTime);
 
                 String endTime = sdf.format(endCal.getTime());
                 feed.putEndTime(endTime);

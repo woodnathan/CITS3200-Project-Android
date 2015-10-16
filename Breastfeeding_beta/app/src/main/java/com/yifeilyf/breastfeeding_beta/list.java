@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Calendar;
 
 public class list extends Activity {
 
@@ -65,6 +66,9 @@ public class list extends Activity {
                     intent.putExtra("com.yifeilyf.breastfeeding_beta.minDate", -1);
                     intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
                 }
+
+                setIntentDateExtras(intent);
+
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", existingFeed);
 
@@ -92,6 +96,8 @@ public class list extends Activity {
                     intent.putExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
                 }
 
+                setIntentDateExtras(intent);
+
                 //The Feed object is a parcelable object type so that passing data can be kept simple
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", newFeed);
@@ -115,6 +121,35 @@ public class list extends Activity {
             }
         });
     }
+
+    private void setIntentDateExtras(Intent intent)
+    {
+        Calendar minCalendar = null;
+        Calendar maxCalendar = null;
+        if (!feedBackingArray.isEmpty())
+        {
+            minCalendar = feedBackingArray.get(0).getStartCal();
+            maxCalendar = feedBackingArray.get(0).getStartCal();
+
+            for (Feed feed : feedBackingArray) {
+                Calendar startCal = feed.getStartCal();
+                if (minCalendar.compareTo(startCal) > 0)
+                {
+                    minCalendar = startCal;
+                }
+                if (maxCalendar.compareTo(startCal) < 0)
+                {
+                    maxCalendar = startCal;
+                }
+            }
+        }
+
+        if (minCalendar != null)
+            intent.putExtra("com.yifeilyf.breastfeeding_beta.minCalendar", minCalendar);
+        if (maxCalendar != null)
+            intent.putExtra("com.yifeilyf.breastfeeding_beta.maxCalendar", maxCalendar);
+    }
+
 
     /**
      * This method will get the result back from edit page

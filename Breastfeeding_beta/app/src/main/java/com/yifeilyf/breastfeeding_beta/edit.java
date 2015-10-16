@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class edit extends Activity {
@@ -49,6 +50,8 @@ public class edit extends Activity {
     private boolean ignoreWeightWarning = false;
     private long minDate;
     private long maxDate;
+    private Calendar minCalendar;
+    private Calendar maxCalendar;
     private boolean studyPeriodWarning = false;
 
     //Data variables
@@ -90,6 +93,8 @@ public class edit extends Activity {
         //used to calculate 24 hour period warnings
         minDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.minDate",-1);
         maxDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
+        minCalendar = (Calendar) intent.getSerializableExtra("com.yifeilyf.breastfeeding_beta.minCalendar");
+        maxCalendar = (Calendar)intent.getSerializableExtra("com.yifeilyf.breastfeeding_beta.maxCalendar");
 
 
         receivedFeed = intent.getParcelableExtra("com.yifeilyf.breastfeeding_beta.newFeed");
@@ -167,13 +172,13 @@ public class edit extends Activity {
                         }
                     }
                     btnDone.setText("Done");
-                }else{
+                }else {
 
 
                     //TODO: data validation checks need to be added as well
                     boolean validated = true;
-                    EditText wb = (EditText)findViewById(R.id.btnWeight1);
-                    EditText wa = (EditText)findViewById(R.id.btnWeight2);
+                    EditText wb = (EditText) findViewById(R.id.btnWeight1);
+                    EditText wa = (EditText) findViewById(R.id.btnWeight2);
 
                     //setup warning prompt
                     AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
@@ -192,33 +197,33 @@ public class edit extends Activity {
                      */
                     //date1
                     //is empty
-                    if(resultDate1.getText().length() == 0) {
+                    if (resultDate1.getText().length() == 0) {
                         resultDate1.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
 
                     //date2
                     //is empty
-                    else if(resultDate2.getText().length() == 0){
+                    else if (resultDate2.getText().length() == 0) {
                         resultDate2.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //start time
                     //is empty
-                    else if(resultTime1.getText().length() == 0){
+                    else if (resultTime1.getText().length() == 0) {
                         resultTime1.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //end time
                     //is empty
-                    else if(resultTime2.getText().length() == 0){
+                    else if (resultTime2.getText().length() == 0) {
                         resultTime2.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
                     //weight before
                     //is empty
 
-                    else if(wb.getText().toString().length() == 0){
+                    else if (wb.getText().toString().length() == 0) {
                         wb.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
@@ -226,7 +231,7 @@ public class edit extends Activity {
                     //is empty
 
 
-                    else if(wa.getText().toString().length() == 0){
+                    else if (wa.getText().toString().length() == 0) {
                         wa.setError(getString(R.string.error_field_required));
                         validated = false;
                     }
@@ -236,7 +241,12 @@ public class edit extends Activity {
                      * VALIDATE DATA
                      * Only enters this section if all data is entered
                      */
-                if(validated) {
+                    if (validated) {
+                        ArrayList<ValidationError> errors = validateFeed();
+                        handleValidationErrors(errors);
+
+                    /*
+
                     //format the date into a friendly comparable format
                     String rd1 = resultDate1.getText().toString();
                     String rd2 = resultDate2.getText().toString();
@@ -353,6 +363,8 @@ public class edit extends Activity {
                     if (validated) {
                         saveAndReturn();
                     }
+                    */
+                    }
                 }
 
 
@@ -371,6 +383,88 @@ public class edit extends Activity {
                 return false;
             }
         });
+    }
+
+    private ArrayList<ValidationError> validateFeed()
+    {
+        // Ensure that Warnings are added at the end of the list
+        // Really the list should be sorted so that warnings come last
+        ArrayList<ValidationError> errors = new ArrayList<ValidationError>();
+
+        if (varStartDate.after(varEndDate))
+        {
+            errors.add(ValidationError.Error("The finish date cannot be before the start date."));
+        }
+        else
+        {
+            long millis = (varEndDate.getTimeInMillis() - varStartDate.getTimeInMillis());
+            double seconds = millis / 1000.0;
+            double minutes = seconds / 60.0;
+
+            if (minutes >= 60.0)
+            {
+                errors.add(ValidationError.Warning("The duration of this feed is greater than 1 hour. Press OK to ignore this warning."));
+            }
+
+            if (minCalendar != null && maxCalendar != null) {
+                Calendar minimumDate = minCalendar;
+                Calendar maximumDate = maxCalendar;
+                if (varStartDate.before(minimumDate))
+                    minimumDate = varStartDate;
+                if (varStartDate.after(maximumDate))
+                    maximumDate = varEndDate;
+
+                long allMillis = (maximumDate.getTimeInMillis() - minimumDate.getTimeInMillis());
+                double allSeconds = allMillis / 1000.0;
+                double allMinutes = allSeconds / 60.0;
+                double allHours = allMinutes / 60.0;
+
+                if (allHours >= 24.0) {
+                    errors.add(ValidationError.Warning("The total time span for the feeds would be greater than 24 hours. Press OK to ignore this warning."));
+                }
+            }
+        }
+
+        return errors;
+    }
+
+    private void handleValidationErrors(final ArrayList<ValidationError> errors)
+    {
+        if (errors.isEmpty())
+        {
+            // Save
+            saveAndReturn();
+        }
+        else
+        {
+            final ValidationError firstError = errors.get(0);
+            errors.remove(0);
+
+            AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
+            validationWarning.setTitle("Invalid Input");
+            validationWarning.setMessage(firstError.getMessage());
+
+            if (firstError.getLevel() == ValidationLevel.Warning) {
+                validationWarning.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+
+            validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+
+                    if (firstError.getLevel() == ValidationLevel.Warning)
+                        handleValidationErrors(errors);
+                }
+            });
+
+            validationWarning.show();
+        }
     }
 
     public void deleteFeed(View v) {
@@ -699,6 +793,39 @@ public class edit extends Activity {
             case 1:
                 btnRightFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
+        }
+    }
+
+    private  enum ValidationLevel { Warning, Error }
+    private static class ValidationError
+    {
+        private ValidationLevel mLevel;
+        private String mMessage;
+
+        public static ValidationError Warning(String message)
+        {
+            return new ValidationError(ValidationLevel.Warning, message);
+        }
+
+        public static ValidationError Error(String message)
+        {
+            return new ValidationError(ValidationLevel.Error, message);
+        }
+
+        public ValidationError(ValidationLevel level, String message)
+        {
+            mLevel = level;
+            mMessage = message;
+        }
+
+        public ValidationLevel getLevel()
+        {
+            return mLevel;
+        }
+
+        public String getMessage()
+        {
+            return mMessage;
         }
     }
 }

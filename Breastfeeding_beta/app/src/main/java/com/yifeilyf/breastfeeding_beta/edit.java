@@ -55,8 +55,8 @@ public class edit extends Activity {
     private SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
     private Calendar varStartDate = Calendar.getInstance();
     private Calendar varEndDate = Calendar.getInstance();
-    //private Time varStartTime;
-    //private Time varEndTime;
+    private int varStartWeight = 0;
+    private int varEndWeight = 0;
     private int selectedFeedType = 0; //0,1,2 = breastfeed,expressed, supplementary
     private int selectedFeedSubType = 0; // 0,1 = left,right or expressed,suplementary
 
@@ -87,30 +87,17 @@ public class edit extends Activity {
         //Receive the feed to be edited and load current data to the UI
         Intent intent = getIntent();
 
-        //used to calculate 24 hour period warnings
+        //Extract data from the intent
         minDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.minDate",-1);
         maxDate = intent.getLongExtra("com.yifeilyf.breastfeeding_beta.maxDate", -1);
-
-
         receivedFeed = intent.getParcelableExtra("com.yifeilyf.breastfeeding_beta.newFeed");
         isEdit = intent.getIntExtra("com.yifeilyf.breastfeeding_beta.editRequestCode", 0);
+
+
         //if request code is 1 the feed can be loaded and editing disabled until edit option is selected
         if(isEdit == 1){
             //load saved feed details to the page
-            resultDate1.setText(receivedFeed.getStartDate());
-            resultDate2.setText(receivedFeed.getEndDate());
-            resultTime1.setText(receivedFeed.getStartTime());
-            resultTime2.setText(receivedFeed.getEndTime());
-            EditText wb = (EditText)findViewById(R.id.btnWeight1);
-            EditText wa = (EditText)findViewById(R.id.btnWeight2);
-            EditText com = (EditText)findViewById(R.id.Comments);
-            wb.setText("" + receivedFeed.getWeightBefore());
-            wa.setText("" + receivedFeed.getWeightAfter());
-            com.setText(receivedFeed.getComment());
-            selectedFeedType = receivedFeed.getType();
-            selectedFeedSubType = receivedFeed.getSubType();
-            varStartDate = receivedFeed.getStartCal();
-            varEndDate = receivedFeed.getEndCal();
+            loadFeed(receivedFeed);
 
             //initialise feed type buttons
             initFeedTypeButtons();
@@ -237,45 +224,37 @@ public class edit extends Activity {
                      * Only enters this section if all data is entered
                      */
                 if(validated) {
-                    //format the date into a friendly comparable format
-                    String rd1 = resultDate1.getText().toString();
-                    String rd2 = resultDate2.getText().toString();
-                    //int d1 = Integer.parseInt(rd1.substring(6, 10) + rd1.substring(3, 5) + rd1.substring(0, 2));
-                    //int d2 = Integer.parseInt(rd2.substring(6, 10) + rd2.substring(3, 5) + rd2.substring(0, 2));
-                    double wbd = Double.parseDouble(wb.getText().toString());
-                    double wad = Double.parseDouble(wa.getText().toString());
+                    int wbd = Integer.parseInt(wb.getText().toString());
+                    int wad = Integer.parseInt(wa.getText().toString());
 
-                        double time1 = Double.parseDouble(resultTime1.getText().toString().replace(':', '.'));
-                        double time2 = Double.parseDouble(resultTime2.getText().toString().replace(':', '.'));
 
-                    //used in calculating the 24 hour period warning
-                    //double dateTime = Double.parseDouble(d1+""+time1);
+                    long st = varStartDate.getTimeInMillis();
+                    long et = varEndDate.getTimeInMillis();
 
-                    //generate comparable integers for the before and after date
-                        int d1 = varStartDate.get(Calendar.YEAR)+varStartDate.get(Calendar.MONTH)+varStartDate.get(Calendar.DAY_OF_MONTH);
-                        int d2 = varEndDate.get(Calendar.YEAR)+varEndDate.get(Calendar.MONTH)+varEndDate.get(Calendar.DAY_OF_MONTH);
+                    double millisHour = 3600000;
+                    double millisDay = millisHour*24;
 
-                        //start date is after end
-                        if (d1 > d2) {
-                            validationWarning.setMessage("The finish date cannot be before the start date.");
+                    if(et < st) { //end is before start
+                        //end date is before start date, checks that its within a day
+                        if (st - et > millisDay || (st - et > millisDay && varStartDate.get(Calendar.DAY_OF_MONTH) != varEndDate.get(Calendar.DAY_OF_MONTH))) {
+                            validationWarning.setMessage("End date is before start date.");
+                            validationWarning.show();
+                            validated = false;
+                        } else { //End time before start
+                            validationWarning.setMessage("End time is before start time.");
                             validationWarning.show();
                             validated = false;
                         }
-                        //start time is after end
-                        //can compare calendars because dates already validated
-                        else if (varEndDate.before(varStartDate)) {
-                            validationWarning.setMessage("The finish time cannot be before the start time.");
-                            validationWarning.show();
-                            validated = false;
-                        }
-                        //same feed longer than 1 hour
+                    } else if(et-st > millisDay){ //More than a day difference
+                        validationWarning.setMessage("The feed length is over a day.");
+                        validationWarning.show();
+                        validated = false;
 
-
-                        else if ((varEndDate.getTimeInMillis()-varStartDate.getTimeInMillis())/3600000 > 1) {
-                            validationWarning.setMessage("The feed duration cannot be longer than one hour.");
-                            validationWarning.show();
-                            validated = false;
-                        }
+                    } else if(et-st > millisHour){ //more than 1 hour
+                        validationWarning.setMessage("The feed length is over an hour.");
+                        validationWarning.show();
+                        validated = false;
+                    }
                         //expression cannot be lower after
                         else if(selectedFeedType == 1 && wbd > wad){
                             validationWarning.setMessage("The weight after expression cannot be lower than the weight before.");
@@ -313,49 +292,38 @@ public class edit extends Activity {
 
                         //warn if this feed is outside the 24h period
                         else if(minDate != -1 && !studyPeriodWarning) {
-                            if (varStartDate.getTimeInMillis() < minDate ) {
-                                double hours = (double)(maxDate - varStartDate.getTimeInMillis()) / 3600000.0;
-                                if (hours > 23.0) {
-                                    studyPeriodWarning = true;
-                                }
-                            } else if (varStartDate.getTimeInMillis() > maxDate) {
-                                double hours = (double)(varStartDate.getTimeInMillis() - minDate) / 3600000.0;
-                                if (hours > 23.0) {
-                                    studyPeriodWarning = true;
-                                }
+                            if (maxDate - st > millisDay) {
+                                studyPeriodWarning = true;
+                            } else if (st - minDate > millisDay) {
+                                studyPeriodWarning = true;
                             }
                         }
-                    //notify of period over 24 hours
-                    //give option to accept and save or cancel save and modify or cancel the feed
-                    if(studyPeriodWarning == true){
-                        validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                dialog.dismiss();
-                                saveAndReturn();
-                            }
-                        });
-                        validationWarning.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                studyPeriodWarning = false;
-                                dialog.dismiss();
-                            }
-                        });
-                        validationWarning.setMessage("The total time span for the feeds would be greater than 24 hours.");
-                        validationWarning.show();
-                        validated = false;
+                        //notify of period over 24 hours
+                        //give option to accept and save or cancel save and modify or cancel the feed
+                        if(studyPeriodWarning == true) {
+                            validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    saveAndReturn();
+                                }
+                            });
+                            validationWarning.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    studyPeriodWarning = false;
+                                    dialog.dismiss();
+                                }
+                            });
+                            validationWarning.setMessage("The total time span for the feeds would be greater than 24 hours.");
+                            validationWarning.show();
+                            validated = false;
+                        }
                     }
-
-                    }
-
                     if (validated) {
                         saveAndReturn();
                     }
                 }
-
-
             }
         });
 
@@ -644,8 +612,9 @@ public class edit extends Activity {
         EditText com = (EditText)findViewById(R.id.Comments);
 
 
-        receivedFeed.putWeightBefore(Double.parseDouble(wb.getText().toString()));
-        receivedFeed.putWeightAfter(Double.parseDouble(wa.getText().toString()));
+        receivedFeed.putWeightBefore(Integer.parseInt(wb.getText().toString()));
+        receivedFeed.putWeightAfter(Integer.parseInt(wa.getText().toString()));
+
         receivedFeed.putComment(com.getText().toString());
 
         receivedFeed.putType(selectedFeedType);
@@ -700,5 +669,30 @@ public class edit extends Activity {
                 btnRightFeedType.setBackgroundResource(R.drawable.btn1);
                 break;
         }
+    }
+
+    /**
+     * utility to load the page data and assign variables from a received feed
+     * @param receivedFeed feed to be loaded
+     */
+    private void loadFeed(Feed receivedFeed) {
+        resultDate1.setText(receivedFeed.getStartDate());
+        resultDate2.setText(receivedFeed.getEndDate());
+        resultTime1.setText(receivedFeed.getStartTime());
+        resultTime2.setText(receivedFeed.getEndTime());
+        EditText wb = (EditText)findViewById(R.id.btnWeight1);
+        EditText wa = (EditText)findViewById(R.id.btnWeight2);
+        EditText com = (EditText)findViewById(R.id.Comments);
+
+        wb.setText("" + receivedFeed.getWeightBefore());
+        wa.setText("" + receivedFeed.getWeightAfter());
+        varStartWeight = receivedFeed.getWeightBefore();
+        varStartWeight = receivedFeed.getWeightAfter();
+
+        com.setText(receivedFeed.getComment());
+        selectedFeedType = receivedFeed.getType();
+        selectedFeedSubType = receivedFeed.getSubType();
+        varStartDate = receivedFeed.getStartCal();
+        varEndDate = receivedFeed.getEndCal();
     }
 }

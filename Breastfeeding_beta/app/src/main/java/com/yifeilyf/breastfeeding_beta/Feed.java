@@ -20,8 +20,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
     private String endTime = "";
     private int type = -1; //(0,1,2) breastfeed expressed supplementary
     private int subType = -1; // (0,1) left,right or expressed,supplementary
-    private double weightBefore = -1;
-    private double weightAfter = -1;
+    private int weightBefore = -1;
+    private int weightAfter = -1;
     private String comment = "";
     private Calendar startCal = Calendar.getInstance();
     private Calendar endCal = Calendar.getInstance();
@@ -36,31 +36,10 @@ public class Feed implements Parcelable, Comparable<Feed> {
     }
 
     //compares based on start date
-    public int compareTo(Feed f) {
-        //if same date
-        if (f.getStartDate().equals(getStartDate())) {
-            //compare time
-            String ft = f.getStartTime();
-            String tt = getStartTime();
-            ft = ft.replace(':','.');
-            tt = tt.replace(':','.');
-            double thisTime = Double.parseDouble(tt);
-            double fTime = Double.parseDouble(ft);
-            return Double.compare(thisTime, fTime);
-        } else {
-            //compare dates
-            SimpleDateFormat format = new SimpleDateFormat("dd/mm/yyyy");
-            try {
-                Date fDate = format.parse(f.getStartDate());
-                Date thisDate = format.parse(getStartDate());
-                return thisDate.compareTo(fDate);
-            } catch (Exception e) {
-                //do nothing
-            }
+    
 
-        }
-        //something went wrong assume equal
-        return 0;
+    public int compareTo(Feed f) {
+        return startCal.compareTo(f.getStartCal());
     }
 
 
@@ -147,22 +126,22 @@ public class Feed implements Parcelable, Comparable<Feed> {
      *
      * @return
      */
-    public double getWeightBefore() {return weightBefore;}
+    public int getWeightBefore() {return weightBefore;}
     /**
      *
      * @return
      */
-    public void putWeightBefore(double weight) {weightBefore = weight;}
+    public void putWeightBefore(int weight) {weightBefore = weight;}
     /**
      *
      * @return
      */
-    public double getWeightAfter() {return weightAfter;}
+    public int getWeightAfter() {return weightAfter;}
     /**
      *
      * @return
      */
-    public void putWeightAfter(double weight) {weightAfter = weight;}
+    public void putWeightAfter(int weight) {weightAfter = weight;}
     /**
      *
      * @return
@@ -199,8 +178,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         endTime= in.readString();
         type= in.readInt();
         subType= in.readInt();
-        weightBefore= in.readDouble();
-        weightAfter= in.readDouble();
+        weightBefore= in.readInt();
+        weightAfter= in.readInt();
         comment= in.readString();
         startCal.setTimeInMillis(in.readLong());
         endCal.setTimeInMillis(in.readLong());
@@ -215,8 +194,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         out.writeString(endTime);
         out.writeInt(type);
         out.writeInt(subType);
-        out.writeDouble(weightBefore);
-        out.writeDouble(weightAfter);
+        out.writeInt(weightBefore);
+        out.writeInt(weightAfter);
         out.writeString(comment);
         out.writeLong(startCal.getTimeInMillis());
         out.writeLong(endCal.getTimeInMillis());

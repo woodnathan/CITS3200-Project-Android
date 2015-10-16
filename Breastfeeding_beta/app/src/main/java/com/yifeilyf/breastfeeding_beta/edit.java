@@ -137,7 +137,7 @@ public class edit extends Activity {
 
         btnDone.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-
+                AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
                 //Calls function to save all data to the feed and return it to the list screen
                 //if a feed is being edited
                 if(isEdit == 1){
@@ -163,7 +163,7 @@ public class edit extends Activity {
                     EditText wa = (EditText)findViewById(R.id.btnWeight2);
 
                     //setup warning prompt
-                    AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
+
                     validationWarning.setTitle("Invalid Input");
                     //validationWarning.setMessage("");
                     validationWarning.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -223,38 +223,38 @@ public class edit extends Activity {
                      * VALIDATE DATA
                      * Only enters this section if all data is entered
                      */
-                if(validated) {
-                    int wbd = Integer.parseInt(wb.getText().toString());
-                    int wad = Integer.parseInt(wa.getText().toString());
+                    if(validated) {
+                        int wbd = Integer.parseInt(wb.getText().toString());
+                        int wad = Integer.parseInt(wa.getText().toString());
 
 
-                    long st = varStartDate.getTimeInMillis();
-                    long et = varEndDate.getTimeInMillis();
+                        long st = varStartDate.getTimeInMillis();
+                        long et = varEndDate.getTimeInMillis();
 
-                    double millisHour = 3600000;
-                    double millisDay = millisHour*24;
+                        double millisHour = 3600000;
+                        double millisDay = millisHour*24;
 
-                    if(et < st) { //end is before start
-                        //end date is before start date, checks that its within a day
-                        if (st - et > millisDay || (st - et > millisDay && varStartDate.get(Calendar.DAY_OF_MONTH) != varEndDate.get(Calendar.DAY_OF_MONTH))) {
-                            validationWarning.setMessage("End date is before start date.");
+                        if(et < st) { //end is before start
+                            //end date is before start date, checks that its within a day
+                            if (st - et > millisDay || (st - et > millisDay && varStartDate.get(Calendar.DAY_OF_MONTH) != varEndDate.get(Calendar.DAY_OF_MONTH))) {
+                                validationWarning.setMessage("End date is before start date.");
+                                validationWarning.show();
+                                validated = false;
+                            } else { //End time before start
+                                validationWarning.setMessage("End time is before start time.");
+                                validationWarning.show();
+                                validated = false;
+                            }
+                        } else if(et-st > millisDay){ //More than a day difference
+                            validationWarning.setMessage("The feed length is over a day.");
                             validationWarning.show();
                             validated = false;
-                        } else { //End time before start
-                            validationWarning.setMessage("End time is before start time.");
+
+                        } else if(et-st > millisHour){ //more than 1 hour
+                            validationWarning.setMessage("The feed length is over an hour.");
                             validationWarning.show();
                             validated = false;
                         }
-                    } else if(et-st > millisDay){ //More than a day difference
-                        validationWarning.setMessage("The feed length is over a day.");
-                        validationWarning.show();
-                        validated = false;
-
-                    } else if(et-st > millisHour){ //more than 1 hour
-                        validationWarning.setMessage("The feed length is over an hour.");
-                        validationWarning.show();
-                        validated = false;
-                    }
                         //expression cannot be lower after
                         else if(selectedFeedType == 1 && wbd > wad){
                             validationWarning.setMessage("The weight after expression cannot be lower than the weight before.");
@@ -657,7 +657,7 @@ public class edit extends Activity {
                 btnLeftFeedType.setText("Left");
                 btnRightFeedType.setText("Right");
                 break;
-    }
+        }
 
         //Setup sub type buttons
         switch (selectedFeedSubType){

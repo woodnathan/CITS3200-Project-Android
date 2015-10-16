@@ -36,8 +36,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
     }
 
     //compares based on start date
-    
-
     public int compareTo(Feed f) {
         return startCal.compareTo(f.getStartCal());
     }
@@ -55,6 +53,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
     public void putStartCal(Calendar cal) {
         startCal = cal;
+
     }
 
     public void putEndCal(Calendar cal){
@@ -110,6 +109,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
+     * @param type
      */
     public void putType(int type) {this.type = type;}
     /**
@@ -120,6 +120,7 @@ public class Feed implements Parcelable, Comparable<Feed> {
     /**
      *
      * @return
+     * @param type
      */
     public void putSubType(int type) {subType = type;}
     /**
@@ -194,8 +195,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
         out.writeString(endTime);
         out.writeInt(type);
         out.writeInt(subType);
-        out.writeInt(weightBefore);
-        out.writeInt(weightAfter);
+        out.writeDouble(weightBefore);
+        out.writeDouble(weightAfter);
         out.writeString(comment);
         out.writeLong(startCal.getTimeInMillis());
         out.writeLong(endCal.getTimeInMillis());

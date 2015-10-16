@@ -3,21 +3,46 @@ package com.yifeilyf.breastfeeding_beta;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
 
 public class list extends Activity {
 
     //Initialise backing data structure variables
     private int feedCount = 0;
     private ArrayList<Feed> feedBackingArray = new ArrayList<Feed>();
+    private String mEmail = "";
+    private String mPassword = "";
+    private UserLoginTask mAuthTask = null;
 
     //UI objects
     ListView feedList; //Scrollable list of feeds
@@ -45,7 +70,12 @@ public class list extends Activity {
 
         //TODO: List can be initialised with data retrieved from the server
 
-        //feedListAdapter.notifyDataSetChanged();
+        Intent intent = getIntent();
+        String feedData = intent.getStringExtra("feedData");
+        mEmail = intent.getStringExtra("mEmail");
+        mPassword = intent.getStringExtra("mPassword");
+        Boolean success = initialise(feedData);
+        feedListAdapter.notifyDataSetChanged();
 
 
 
@@ -190,7 +220,70 @@ public class list extends Activity {
             }
         }
         feedBackingArray.add(newFeed);
+        try {
+            JSONObject jsonObject = formatFeed(newFeed);
+            System.out.println("SENDING FEED");
+            mAuthTask = new UserLoginTask(jsonObject.toString());
+            mAuthTask.execute((Void) null);
+        } catch (JSONException e) {
+           return false;
+        }
+
+
         return true;
+    }
+
+    private JSONObject formatFeed(Feed newFeed) throws JSONException{
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        JSONArray feedlist = new JSONArray();
+        JSONObject feed = new JSONObject();
+        JSONObject before = new JSONObject();
+        JSONObject after = new JSONObject();
+
+        //Write before and after times to JSONArrays
+        Date date =  newFeed.getStartCal().getTime();
+        before.put("date", sdf.format(date));
+        before.put("weight", newFeed.getWeightBefore());
+
+        date =  newFeed.getEndCal().getTime();
+        after.put("date", sdf.format(date));
+        after.put("weight", newFeed.getWeightAfter());
+
+        //Write type and subtype of feed
+        if (newFeed.getType() == 0) {
+            feed.put("type", "Breastfeed");
+        } else if (newFeed.getType() == 1) {
+            feed.put("type", "Expressed");
+        } else {
+            feed.put("type", "Supplementary");
+        }
+
+        if (newFeed.getType() != 2) {
+            if (newFeed.getSubType() == 0) {
+                feed.put("side", "Left");
+            } else {
+                feed.put("side", "Right");
+            }
+
+        } else if (newFeed.getSubType() == 0) {
+            feed.put("subtype", "Expressed");
+        } else {
+            feed.put("subtype", "Formula");
+        }
+
+        //Write comment if exists
+        if (!newFeed.getComment().equals("")) {
+            feed.put("comment", newFeed.getComment());
+        }
+
+        //Write times Arrays into feed master Array
+        feed.put("before", before);
+        feed.put("after", after);
+        feedlist.put(feed);
+        JSONObject data = new JSONObject();
+        data.put("feeds", feedlist);
+        System.out.println(data.toString());
+        return data;
     }
 
     /**
@@ -223,4 +316,188 @@ public class list extends Activity {
         finish();
     }
 
+    /**
+     * Private method used to initialise the feed list backing array from the server.
+     * @param feedData The feed data received from the server (a JSONObject parsed as a String)
+     */
+    private Boolean initialise(String feedData) {
+        System.out.println(feedData);
+        try {
+            JSONObject jsonObject = new JSONObject(feedData);
+            JSONArray feedArray = jsonObject.getJSONArray("feeds");
+            for (int i = 0; i < feedArray.length(); i++) {
+                Feed feed = new Feed(feedCount++);
+                JSONObject data = feedArray.getJSONObject(i);
+
+                //Create and add calendar and time. objects
+                Calendar startCal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                startCal.setTime(sdf.parse(data.getJSONObject("before").getString("date")));
+                feed.putStartCal(startCal);
+
+                Calendar endCal = Calendar.getInstance();
+                endCal.setTime(sdf.parse(data.getJSONObject("after").getString("date")));
+                feed.putEndCal(endCal);
+
+                sdf = new SimpleDateFormat("dd/MM/yyyy");
+                String startDate = sdf.format(startCal.getTime());
+                feed.putStartDate(startDate);
+
+                String endDate = sdf.format(endCal.getTime());
+                feed.putEndDate(endDate);
+
+                sdf = new SimpleDateFormat("HH:mm");
+                String startTime = sdf.format(startCal.getTime());
+                feed.putStartTime(startDate);
+
+                String endTime = sdf.format(endCal.getTime());
+                feed.putEndTime(endTime);
+
+                //Add weights
+                feed.putWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
+                System.out.println(data.getJSONObject("before").getString("weight"));
+                feed.putWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
+                System.out.println(data.getJSONObject("after").getString("weight"));
+                feed.putComment(data.getString("comment"));
+
+                //Add feed types
+                if (data.getString("type").equals("B")) {
+                    feed.putType(0);
+                } else if (data.getString("type").equals("E")) {
+                    feed.putType(1);
+                } else {
+                    feed.putType(2);
+                }
+
+                if (data.getString("subtype").equals("U") || data.getString("subtype").equals("L") || data.getString("subtype").equals("E")) {
+                    feed.putSubType(0);
+                } else {
+                    feed.putSubType(1);
+                }
+
+                //Submit feed
+                int id = feed.getID();
+                for(int j = 0; j < feedBackingArray.size(); j++) {
+                    if(feedBackingArray.get(j) != null) {
+                        if(feedBackingArray.get(j).getID() == id) {
+                            //A feed with the same ID is already contained in the array
+                            return false;
+                        }
+                    }
+                }
+                feedBackingArray.add(feed);
+            }
+        } catch (JSONException e) {
+            return false;
+        } catch (ParseException e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Represents an asynchronous login/registration task used to authenticate
+     * the user.
+     */
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+
+
+        private String feedData;
+
+        UserLoginTask(String data) {
+            feedData = data;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            try {
+                // Simulate network access.
+                //Thread.sleep(2000);
+                System.out.println("Starting doInBackground.");
+                URL url = new URL("https://breastfeeding.bcs.uwa.edu.au/milk/api/api.php?_action=add_feeds");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                try {
+                    System.out.println("Starting connection.");
+
+                    urlConnection.setRequestMethod("POST");
+                    urlConnection.setRequestProperty("Content-Type", "application/json");
+                    urlConnection.setRequestProperty("Accept", "application/json");
+                    urlConnection.setRequestProperty("X-Mother-Username", mEmail);
+                    urlConnection.setRequestProperty("X-Mother-Password", mPassword);
+                    urlConnection.setDoInput(true);
+                    urlConnection.setDoOutput(true);
+
+                    StringBuilder sb = new StringBuilder();
+                    JSONObject jsonObject = new JSONObject();
+                    int HttpResult = urlConnection.getResponseCode();
+                    if(HttpResult == HttpURLConnection.HTTP_OK){
+                        BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
+                        String line = null;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line + "\n");
+                        }
+
+                        br.close();
+
+                        System.out.println("Received: " + sb.toString());
+                        jsonObject = new JSONObject(sb.toString());
+                    }else{
+                        System.out.println(urlConnection.getResponseMessage());
+                    }
+
+                    if (sb.toString().contains("error")) {
+                        System.out.print("Error ");
+                        System.out.println(jsonObject.getJSONObject("code"));
+                        System.out.println(jsonObject.getJSONObject("message"));
+                        return false;
+                    }
+                } finally {
+                    urlConnection.disconnect();
+                }
+
+            } catch (MalformedURLException e) {
+                return false;
+            } catch (IOException e) {
+                return false;
+            } catch (JSONException e) {
+                return false;
+            }
+
+            /*for (String credential : DUMMY_CREDENTIALS) {
+                String[] pieces = credential.split(":");
+                if (pieces[0].equals(mEmail)) {
+                    // Account exists, return true if the password matches.
+                    return pieces[1].equals(mPassword);
+                }
+            }*/
+
+            // TODO: register the new account here.
+            return true;
+        }
+
+        /**
+         *
+         * @param success login successful if password and username are corrected, otherwise show a error message
+         */
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+
+            if (success) {
+                finish();
+            } else {
+
+            }
+        }
+
+        /**
+         *
+         */
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+        }
+    }
 }

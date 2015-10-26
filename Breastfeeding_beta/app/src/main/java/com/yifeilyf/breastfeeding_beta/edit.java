@@ -671,7 +671,7 @@ public class edit extends Activity {
                 btnLeftFeedType.setText("Left");
                 btnRightFeedType.setText("Right");
                 break;
-        }
+    }
 
         btnLeftFeedType.setBackgroundResource(R.drawable.textview_border);
         btnRightFeedType.setBackgroundResource(R.drawable.textview_border);

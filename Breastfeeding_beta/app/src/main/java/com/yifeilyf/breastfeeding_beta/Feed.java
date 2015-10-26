@@ -130,9 +130,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
     public int getID(){return ID;}
 
 
-    /* public String toString() {
-         return getStartDate() + " " + getStartTime();
-     }*/
     public String toString(){
         return formatDateTime.format(getStartCal().getTime());
     }

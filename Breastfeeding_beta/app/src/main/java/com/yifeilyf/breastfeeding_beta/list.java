@@ -22,10 +22,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -222,11 +225,10 @@ public class list extends Activity {
         feedBackingArray.add(newFeed);
         try {
             JSONObject jsonObject = formatFeed(newFeed);
-            System.out.println("SENDING FEED");
             mAuthTask = new UserLoginTask(jsonObject.toString());
             mAuthTask.execute((Void) null);
         } catch (JSONException e) {
-           return false;
+            return false;
         }
 
 
@@ -339,20 +341,6 @@ public class list extends Activity {
                 endCal.setTime(sdf.parse(data.getJSONObject("after").getString("date")));
                 feed.putEndCal(endCal);
 
-                sdf = new SimpleDateFormat("dd/MM/yyyy");
-                String startDate = sdf.format(startCal.getTime());
-                feed.putStartDate(startDate);
-
-                String endDate = sdf.format(endCal.getTime());
-                feed.putEndDate(endDate);
-
-                sdf = new SimpleDateFormat("HH:mm");
-                String startTime = sdf.format(startCal.getTime());
-                feed.putStartTime(startDate);
-
-                String endTime = sdf.format(endCal.getTime());
-                feed.putEndTime(endTime);
-
                 //Add weights
                 feed.putWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
                 System.out.println(data.getJSONObject("before").getString("weight"));
@@ -418,51 +406,54 @@ public class list extends Activity {
                 System.out.println("Starting doInBackground.");
                 URL url = new URL("https://breastfeeding.bcs.uwa.edu.au/milk/api/api.php?_action=add_feeds");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                try {
-                    System.out.println("Starting connection.");
+                System.out.println("Starting connection.");
+                urlConnection.setDoInput(true);
+                urlConnection.setDoOutput(true);
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setRequestProperty("X-Mother-Username", mEmail);
+                urlConnection.setRequestProperty("X-Mother-Password", mPassword);
 
-                    urlConnection.setRequestMethod("POST");
-                    urlConnection.setRequestProperty("Content-Type", "application/json");
-                    urlConnection.setRequestProperty("Accept", "application/json");
-                    urlConnection.setRequestProperty("X-Mother-Username", mEmail);
-                    urlConnection.setRequestProperty("X-Mother-Password", mPassword);
-                    urlConnection.setDoInput(true);
-                    urlConnection.setDoOutput(true);
+                OutputStreamWriter out = new OutputStreamWriter(new BufferedOutputStream(urlConnection.getOutputStream()));
 
-                    StringBuilder sb = new StringBuilder();
-                    JSONObject jsonObject = new JSONObject();
-                    int HttpResult = urlConnection.getResponseCode();
-                    if(HttpResult == HttpURLConnection.HTTP_OK){
-                        BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line + "\n");
-                        }
-
-                        br.close();
-
-                        System.out.println("Received: " + sb.toString());
-                        jsonObject = new JSONObject(sb.toString());
-                    }else{
-                        System.out.println(urlConnection.getResponseMessage());
+                StringBuilder sb = new StringBuilder();
+                JSONObject jsonObject = new JSONObject(feedData);
+                out.write(feedData);
+                out.close();
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
+                int HttpResult = urlConnection.getResponseCode();
+                if(HttpResult == HttpURLConnection.HTTP_OK){
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
                     }
+                    br.close();
+                    System.out.println("Received: " + sb.toString());
+                    jsonObject = new JSONObject(sb.toString());
+                } else{
 
-                    if (sb.toString().contains("error")) {
-                        System.out.print("Error ");
-                        System.out.println(jsonObject.getJSONObject("code"));
-                        System.out.println(jsonObject.getJSONObject("message"));
-                        return false;
-                    }
-                } finally {
-                    urlConnection.disconnect();
+                    System.out.println(urlConnection.getResponseMessage());
                 }
+
+                if (sb.toString().contains("error")) {
+                    System.out.print("Error ");
+                    System.out.println(jsonObject.getJSONObject("code"));
+                    System.out.println(jsonObject.getJSONObject("message"));
+                    return false;
+                }
+                urlConnection.disconnect();
 
             } catch (MalformedURLException e) {
                 return false;
-            } catch (IOException e) {
-                return false;
             } catch (JSONException e) {
                 return false;
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             /*for (String credential : DUMMY_CREDENTIALS) {

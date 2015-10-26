@@ -293,7 +293,7 @@ public class login extends Activity{
                         return false;
                     } else {
                         urlConnection.disconnect();
-                        url = new URL("http://hhlrg.woodnathan.com/milk/api/api.php?_action=get_feeds");
+                        url = new URL("https://breastfeeding.bcs.uwa.edu.au/milk/api/api.php?_action=get_feeds");
                         urlConnection = (HttpURLConnection) url.openConnection();
                         System.out.println("Starting get_feeds.");
 

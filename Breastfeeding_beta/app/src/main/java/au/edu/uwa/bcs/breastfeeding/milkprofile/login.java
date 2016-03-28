@@ -1,4 +1,4 @@
-package com.yifeilyf.breastfeeding_beta;
+package au.edu.uwa.bcs.breastfeeding.milkprofile;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -20,14 +20,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.yifeilyf.breastfeeding_beta.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -230,12 +230,27 @@ public class login extends Activity{
         int IS_PRIMARY = 1;
     }
 
+    public static class UserLoginTaskResult {
+        public static UserLoginTaskResult Success = new UserLoginTaskResult("Success");
+        public static UserLoginTaskResult IncorrectPassword = new UserLoginTaskResult("Incorrect Password");
+
+        private final String mMessage;
+
+        public UserLoginTaskResult(String message) {
+            mMessage = message;
+        }
+
+        public String getMessage() {
+            return mMessage;
+        }
+    }
+
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, UserLoginTaskResult> {
 
         private final String mEmail;
         private final String mPassword;
@@ -247,7 +262,7 @@ public class login extends Activity{
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected UserLoginTaskResult doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
             try {
@@ -290,9 +305,23 @@ public class login extends Activity{
                         System.out.print("Error ");
                         System.out.println(jsonObject.getJSONObject("code"));
                         System.out.println(jsonObject.getJSONObject("message"));
-                        return false;
-                    } else {
-                        urlConnection.disconnect();
+                        return UserLoginTaskResult.IncorrectPassword;
+                    }
+
+                    boolean collectingSamples = false;
+                    boolean acceptedConsentForm = false;
+                    try {
+                        JSONObject userObj = jsonObject.getJSONObject("user");
+//                        collectingSamples = userObj.getBoolean("collecting_samples");
+                        acceptedConsentForm = userObj.getBoolean("accepted_consent_form");
+                    } catch (JSONException e) {
+                        System.out.println(e.getMessage());
+                        return UserLoginTaskResult.IncorrectPassword;
+                    }
+                    urlConnection.disconnect();
+
+                    if (acceptedConsentForm)
+                    {
                         url = new URL("https://breastfeeding.bcs.uwa.edu.au/milk/api/api.php?_action=get_feeds");
                         urlConnection = (HttpURLConnection) url.openConnection();
                         System.out.println("Starting get_feeds.");
@@ -321,32 +350,39 @@ public class login extends Activity{
                             System.out.println(urlConnection.getResponseMessage());
                         }
                     }
+//                    else if (!collectingSamples) {
+//                        return new UserLoginTaskResult("");
+//                    }
+                    else
+                    {
+                        return new UserLoginTaskResult("You have not accepted the consent form. Please login to the website first and accept the form before logging in here.");
+                    }
                 } finally {
                     urlConnection.disconnect();
                 }
 
             } catch (MalformedURLException e) {
-                return false;
+                return UserLoginTaskResult.IncorrectPassword;
             } catch (IOException e) {
-                return false;
+                return UserLoginTaskResult.IncorrectPassword;
             } catch (JSONException e) {
-                return false;
+                return UserLoginTaskResult.IncorrectPassword;
             }
 
             // TODO: register the new account here.
-            return true;
+            return UserLoginTaskResult.Success;
         }
 
         /**
          *
-         * @param success login successful if password and username are corrected, otherwise show a error message
+         * @param result login successful if password and username are corrected, otherwise show a error message
          */
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final UserLoginTaskResult result) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
+            if (result == UserLoginTaskResult.Success) {
                 Intent intent = new Intent(login.this, list.class);
                 intent.putExtra("mEmail", mEmail);
                 intent.putExtra("mPassword", mPassword);
@@ -354,7 +390,11 @@ public class login extends Activity{
                 startActivity(intent);
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                String errorString = result.getMessage();
+                if (result == UserLoginTaskResult.IncorrectPassword)
+                    errorString = getString(R.string.error_incorrect_password);
+
+                mPasswordView.setError(errorString);
                 mPasswordView.requestFocus();
             }
         }

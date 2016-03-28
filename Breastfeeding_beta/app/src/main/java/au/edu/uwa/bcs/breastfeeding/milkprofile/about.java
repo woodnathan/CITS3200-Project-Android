@@ -1,4 +1,4 @@
-package com.yifeilyf.breastfeeding_beta;
+package au.edu.uwa.bcs.breastfeeding.milkprofile;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.yifeilyf.breastfeeding_beta.R;
 
 /**
  * Created by yifei on 10/13/2015.

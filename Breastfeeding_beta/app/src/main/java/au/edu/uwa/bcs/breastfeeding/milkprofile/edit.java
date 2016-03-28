@@ -1,4 +1,4 @@
-package com.yifeilyf.breastfeeding_beta;
+package au.edu.uwa.bcs.breastfeeding.milkprofile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,6 +22,8 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.yifeilyf.breastfeeding_beta.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

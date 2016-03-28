@@ -1,11 +1,10 @@
-package com.yifeilyf.breastfeeding_beta;
+package au.edu.uwa.bcs.breastfeeding.milkprofile;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by Josh on 20/09/2015.

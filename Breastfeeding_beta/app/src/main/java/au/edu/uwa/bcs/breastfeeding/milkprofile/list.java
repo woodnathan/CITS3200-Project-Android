@@ -1,4 +1,4 @@
-package com.yifeilyf.breastfeeding_beta;
+package au.edu.uwa.bcs.breastfeeding.milkprofile;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,8 +10,9 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
+
+import com.yifeilyf.breastfeeding_beta.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,18 +20,14 @@ import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

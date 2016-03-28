@@ -284,7 +284,7 @@
                 android:id="@+id/Coments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/Coments"
+                android:text="@string/Comments"
                 android:layout_below="@+id/btnWeight1"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"/>
@@ -297,7 +297,7 @@
                 android:layout_marginTop="5dp"
                 android:background="@drawable/textview_border"
                 android:maxLines="4"
-                android:hint="@string/Coments"
+                android:hint="@string/Comments"
                 android:layout_marginBottom="20dp"
                 android:id="@+id/Comments" />
         </RelativeLayout>

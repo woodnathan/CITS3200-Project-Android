@@ -154,12 +154,10 @@
 
             <TextView
                 android:id="@+id/Type"
-                android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:text="@string/TYPE"
                 android:layout_below="@+id/SelectTime1"/>
 
             <Button
@@ -201,59 +199,29 @@
                 android:text="@string/Supplementary"/>
 
             <TextView
-                android:id="@+id/Breast"
+                android:id="@+id/LeftWeightBefore"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:text=""
+                android:textSize="12dp"
                 android:layout_below="@+id/btnType1"/>
 
-            <Button
-                android:id="@+id/btnBreast1"
-                android:layout_marginTop="5dp"
-                android:layout_marginLeft="25dp"
-                android:layout_width="155dp"
-                android:layout_height="40dp"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/Breast"
-                android:background="@drawable/textview_border"
-                android:onClick="onClickBreast"/>
-
-            <Button
-                android:id="@+id/btnBreast2"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="25dp"
-                android:layout_width="155dp"
-                android:layout_height="40dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/Breast"
-                android:background="@drawable/textview_border"
-                android:onClick="onClickBreast"/>
-
             <TextView
-                android:id="@+id/WeightBefore"
+                android:id="@+id/LeftWeightAfter"
                 android:layout_marginTop="5dp"
-                android:layout_marginLeft="25dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:text="@string/WEIGHT_BEFORE"
-                android:layout_below="@+id/btnBreast1"/>
-
-            <TextView
-                android:id="@+id/WeightAfter"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="78dp"
+                android:layout_marginRight="45dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="@string/WEIGHT_AFTER"
-                android:layout_below="@+id/btnBreast2"/>
+                android:text=""
+                android:textSize="12dp"
+                android:layout_below="@+id/btnType1"/>
 
             <EditText
-                android:id="@+id/btnWeight1"
+                android:id="@+id/TextLWB"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"
                 android:layout_width="150dp"
@@ -262,12 +230,12 @@
                 android:gravity="left"
                 android:padding="7dp"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/WeightBefore"
+                android:layout_below="@+id/LeftWeightBefore"
                 android:background="@drawable/textview_border"
-                android:inputType="number" />
+                android:inputType="number"/>
 
             <EditText
-                android:id="@+id/btnWeight2"
+                android:id="@+id/TextLWA"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="25dp"
                 android:layout_width="150dp"
@@ -275,7 +243,57 @@
                 android:hint="@string/grams"
                 android:gravity="left"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/WeightAfter"
+                android:layout_below="@+id/LeftWeightBefore"
+                android:background="@drawable/textview_border"
+                android:padding="7dp"
+                android:inputType="number"/>
+
+            <TextView
+                android:id="@+id/RightWeightBefore"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text=""
+                android:textSize="12dp"
+                android:layout_below="@+id/TextLWB"/>
+
+            <TextView
+                android:id="@+id/RightWeightAfter"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="45dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text=""
+                android:textSize="12dp"
+                android:layout_below="@+id/TextLWA"/>
+
+            <EditText
+                android:id="@+id/TextRWB"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:hint="@string/grams"
+                android:gravity="left"
+                android:padding="7dp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/RightWeightBefore"
+                android:background="@drawable/textview_border"
+                android:inputType="number" />
+
+            <EditText
+                android:id="@+id/TextRWA"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="25dp"
+                android:layout_width="150dp"
+                android:layout_height="40dp"
+                android:hint="@string/grams"
+                android:gravity="left"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/RightWeightAfter"
                 android:background="@drawable/textview_border"
                 android:padding="7dp"
                 android:inputType="number" />
@@ -285,7 +303,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Comments"
-                android:layout_below="@+id/btnWeight1"
+                android:layout_below="@+id/TextRWB"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"/>
 

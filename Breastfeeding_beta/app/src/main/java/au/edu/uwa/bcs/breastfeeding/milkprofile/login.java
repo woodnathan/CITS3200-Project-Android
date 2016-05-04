@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -48,6 +50,9 @@ public class login extends Activity{
     private View mProgressView;
     private View mLoginFormView;
 
+    private SharedPreferences sp = null;
+    private CheckBox savePassword;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +68,17 @@ public class login extends Activity{
 
         mEmailView = (EditText) findViewById(R.id.tvLogin);
         mPasswordView = (EditText) findViewById(R.id.tvPassword);
+
+        //get the remembered acount and password from sharedPreference
+        String savedEmail = getSavedEmail();
+        String savedPassword = getSavedPassword();
+        if(savedEmail.length()>0 && savedPassword.length()>0){
+            mEmailView.setText(savedEmail);
+            mPasswordView.setText(savedPassword);
+        }
+
+        savePassword = (CheckBox) findViewById(R.id.chkRemember);
+
 
         Button btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -153,12 +169,37 @@ public class login extends Activity{
             // form field with an error.
             focusView.requestFocus();
         } else {
+
+            // save data in local shared preferences
+            if (savePassword.isChecked()) {
+                saveLoginDetails(email, password);
+            }
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
+    }
+
+    /**
+     *  This method store account and password by SharedPreference
+     */
+    private void saveLoginDetails(String email, String password) {
+        new PrefManager(this).saveLoginDetails(email, password);
+    }
+    /**
+     *  This method get account from sharedPreference
+     */
+    private String getSavedEmail(){
+        return new PrefManager(this).getEmail();
+    }
+    /**
+     *  This method get password from sharedPreference
+     */
+    private String getSavedPassword(){
+        return new PrefManager(this).getPassword();
     }
 
     /**

@@ -23,10 +23,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+<<<<<<< Updated upstream:Breastfeeding_beta/app/src/main/java/au/edu/uwa/bcs/breastfeeding/milkprofile/edit.java
 import com.yifeilyf.breastfeeding_beta.R;
+=======
+import org.w3c.dom.Text;
+>>>>>>> Stashed changes:Breastfeeding_beta/app/src/main/java/com/yifeilyf/breastfeeding_beta/edit.java
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+/*
+ * lwb means left breast feeds weight before
+ * lwa means left breast feeds weight after
+ * wb means right breast feeds weight before
+ * wa means right breast feeds weight after
+ */
 
 public class edit extends Activity {
     //Feed object to be edited
@@ -35,9 +46,12 @@ public class edit extends Activity {
     //Setup UI interfaces
     private TextView resultTime1, resultTime2;
     private TextView resultDate1, resultDate2;
-    private TextView FeedType;
-    private Button btnLeftFeedType;
-    private Button btnRightFeedType;
+    private TextView LeftWeightBefore;
+    private TextView LeftWeightAfter;
+    private TextView RightWeightBefore;
+    private TextView RightWeightAfter;
+    //private Button btnLeftFeedType;
+    //private Button btnRightFeedType;
     private Button btnFeedBreast;
     private Button btnFeedExpressed;
     private Button btnFeedSupplement;
@@ -61,7 +75,7 @@ public class edit extends Activity {
     private Calendar varStartDate = Calendar.getInstance();
     private Calendar varEndDate = Calendar.getInstance();
     private int selectedFeedType = -1; //0,1,2 = breastfeed,expressed, supplementary
-    private int selectedFeedSubType = -1; // 0,1 = left,right or expressed,suplementary
+    //private int selectedFeedSubType = -1; // 0,1 = left,right or expressed,suplementary
 
 
     @Override
@@ -79,9 +93,13 @@ public class edit extends Activity {
         resultDate1 = (TextView) findViewById(R.id.SelectDate1);
         resultDate2 = (TextView) findViewById(R.id.SelectDate2);
 
-        FeedType = (TextView) findViewById(R.id.Breast);
-        btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
-        btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
+        LeftWeightBefore = (TextView) findViewById(R.id.LeftWeightBefore);
+        LeftWeightAfter = (TextView) findViewById(R.id.LeftWeightAfter);
+        RightWeightBefore = (TextView) findViewById(R.id.RightWeightBefore);
+        RightWeightAfter = (TextView) findViewById(R.id.RightWeightAfter);
+
+        //btnLeftFeedType = (Button) findViewById(R.id.btnBreast1);
+        //btnRightFeedType = (Button) findViewById(R.id.btnBreast2);
 
         btnFeedBreast = (Button) findViewById(R.id.btnType1);
         btnFeedExpressed = (Button) findViewById(R.id.btnType3);
@@ -206,8 +224,8 @@ public class edit extends Activity {
      */
     private boolean validateFeed(){
         boolean validated = true;
-        EditText wb = (EditText)findViewById(R.id.btnWeight1);
-        EditText wa = (EditText)findViewById(R.id.btnWeight2);
+        EditText wb = (EditText)findViewById(R.id.TextRWB);
+        EditText wa = (EditText)findViewById(R.id.TextRWA);
 
         //setup warning prompt
         AlertDialog.Builder validationWarning = new AlertDialog.Builder(edit.this);
@@ -303,11 +321,11 @@ public class edit extends Activity {
                 validated = false;
             }
             //subType not selected
-            else if(selectedFeedSubType == -1) {
-                validationWarning.setMessage("The feed sub type has not been selected.");
-                validationWarning.show();
-                validated = false;
-            }
+//            else if(selectedFeedSubType == -1) {
+//                validationWarning.setMessage("The feed sub type has not been selected.");
+//                validationWarning.show();
+//                validated = false;
+//            }
             //expression cannot be lower after
             else if(selectedFeedType == 1 && wbd > wad){
                 validationWarning.setMessage("The weight after expression cannot be lower than the weight before.");
@@ -551,21 +569,21 @@ public class edit extends Activity {
             case R.id.btnType1:
                 selectedFeedType = 0;
                 //reset the subtype selection
-                selectedFeedSubType = -1;
+                //selectedFeedSubType = -1;
                 break;
 
             //type supplementary
             case R.id.btnType2:
                 selectedFeedType = 2;
                 //reset the subtype selection
-                selectedFeedSubType = -1;
+                //selectedFeedSubType = -1;
                 break;
 
             //type expressed
             case R.id.btnType3:
                 selectedFeedType = 1;
                 //reset the subtype selection
-                selectedFeedSubType = -1;
+                //selectedFeedSubType = -1;
                 break;
         }
         //update the UI
@@ -580,20 +598,20 @@ public class edit extends Activity {
      */
 
 
-    public void onClickBreast(View v){
-        //Switch on left or right button clicked
-        //set the selectedFeedSubType variable accordingly
-        switch (v.getId()){
-            case R.id.btnBreast1:
-                selectedFeedSubType = 0;
-                break;
-            case R.id.btnBreast2:
-                selectedFeedSubType = 1;
-                break;
-        }
-        //update UI
-        displayFeedTypeButtons();
-    }
+//    public void onClickBreast(View v){
+//        //Switch on left or right button clicked
+//        //set the selectedFeedSubType variable accordingly
+//        switch (v.getId()){
+//            case R.id.btnBreast1:
+//                selectedFeedSubType = 0;
+//                break;
+//            case R.id.btnBreast2:
+//                selectedFeedSubType = 1;
+//                break;
+//        }
+//        //update UI
+//        displayFeedTypeButtons();
+//    }
 
     /**
      * The method will hide the soft keyboard
@@ -613,8 +631,8 @@ public class edit extends Activity {
         //This function assumes that all required data has been entered already
         //It will simply save and send to keep things simple
 
-        EditText wb = (EditText)findViewById(R.id.btnWeight1);
-        EditText wa = (EditText)findViewById(R.id.btnWeight2);
+        EditText wb = (EditText)findViewById(R.id.TextRWB);
+        EditText wa = (EditText)findViewById(R.id.TextRWA);
         EditText com = (EditText)findViewById(R.id.Comments);
 
 
@@ -624,7 +642,7 @@ public class edit extends Activity {
         receivedFeed.putComment(com.getText().toString());
 
         receivedFeed.putType(selectedFeedType);
-        receivedFeed.putSubType(selectedFeedSubType);
+        //receivedFeed.putSubType(selectedFeedSubType);
 
 
         receivedFeed.putStartCal(varStartDate);
@@ -646,47 +664,78 @@ public class edit extends Activity {
         btnFeedExpressed.setBackgroundResource(R.drawable.textview_border);
         btnFeedSupplement.setBackgroundResource(R.drawable.textview_border);
 
+        EditText TextLWA = (EditText)findViewById(R.id.TextLWA);
+        EditText TextLWB = (EditText)findViewById(R.id.TextLWB);
+        TextView LeftWeightBefore = (TextView)findViewById(R.id.LeftWeightBefore);
+        TextView LeftWeightAfter = (TextView)findViewById(R.id.LeftWeightAfter);
+
         //setup feed type buttons
         switch (selectedFeedType){
             case -1: //initialise
-                FeedType.setText("Breastfeed Type");
-                btnLeftFeedType.setText("Left");
-                btnRightFeedType.setText("Right");
+                //FeedType.setText("Breastfeed Type");
+                //btnLeftFeedType.setText("Left");
+                //btnRightFeedType.setText("Right");
+//                LeftWeightBefore.setText("LEFT BREAST\nWEIGHT BEFORE");
+//                LeftWeightAfter.setText("LEFT BREAST\nWEIGHT AFTER");
+//                RightWeightBefore.setText("RIGHT BREAST\nWEIGHT BEFORE");
+//                RightWeightAfter.setText("RIGHT BREAST\nWEIGHT AFTER");
                 break;
             case 0:
                 btnFeedBreast.setBackgroundResource(R.drawable.btn1);
-                FeedType.setText("Breastfeed Type");
-                btnLeftFeedType.setText("Left");
-                btnRightFeedType.setText("Right");
+                LeftWeightBefore.setText("  LEFT\nBABY WEIGHT BEFORE");
+                LeftWeightAfter.setText("  LEFT\nBABY WEIGHT AFTER");
+                RightWeightBefore.setText("  RIGHT\nBABY WEIGHT BEFORE");
+                RightWeightAfter.setText("  RIGHT\nBABY WEIGHT AFTER");
+                //btnLeftFeedType.setText("Left");
+                //btnRightFeedType.setText("Right");
+                TextLWA.setVisibility(View.VISIBLE);
+                TextLWB.setVisibility(View.VISIBLE);
+                LeftWeightBefore.setVisibility(View.VISIBLE);
+                LeftWeightAfter.setVisibility(View.VISIBLE);
                 break;
 
             case 2:
                 btnFeedSupplement.setBackgroundResource(R.drawable.btn1);
-                FeedType.setText("Supplementary Type");
-                btnLeftFeedType.setText("Expressed");
-                btnRightFeedType.setText("Formula");
+//                LeftWeightBefore.setText("  LEFT\nBABY WEIGHT BEFORE");
+//                LeftWeightAfter.setText("  LEFT\nBABY WEIGHT AFTER");
+                RightWeightBefore.setText("\nBABY WEIGHT BEFORE");
+                RightWeightAfter.setText("\nBABY WEIGHT AFTER");
+                //btnLeftFeedType.setText("Expressed");
+                //btnRightFeedType.setText("Formula");
+                TextLWA.setVisibility(View.GONE);
+                TextLWB.setVisibility(View.GONE);
+                LeftWeightBefore.setVisibility(View.GONE);
+                LeftWeightAfter.setVisibility(View.GONE);
                 break;
 
             case 1:
                 btnFeedExpressed.setBackgroundResource(R.drawable.btn1);
-                FeedType.setText("Expressed Type");
-                btnLeftFeedType.setText("Left");
-                btnRightFeedType.setText("Right");
+                TextLWA.setVisibility(View.GONE);
+                TextLWB.setVisibility(View.GONE);
+                LeftWeightBefore.setVisibility(View.GONE);
+                LeftWeightAfter.setVisibility(View.GONE);
+//                btnFeedExpressed.setBackgroundResource(R.drawable.btn1);
+//                LeftWeightBefore.setText("  LEFT\nBOTTLE WEIGHT BEFORE");
+//                LeftWeightAfter.setText("  LEFT\nBOTTLE WEIGHT AFTER");
+                RightWeightBefore.setText("\nBOTTLE WEIGHT BEFORE");
+                RightWeightAfter.setText("\nBOTTLE WEIGHT AFTER");
+                //btnLeftFeedType.setText("Left");
+                //btnRightFeedType.setText("Right");
                 break;
     }
 
-        btnLeftFeedType.setBackgroundResource(R.drawable.textview_border);
-        btnRightFeedType.setBackgroundResource(R.drawable.textview_border);
+        //btnLeftFeedType.setBackgroundResource(R.drawable.textview_border);
+        //btnRightFeedType.setBackgroundResource(R.drawable.textview_border);
         //Setup sub type buttons
-        switch (selectedFeedSubType){
-            case 0:
-                btnLeftFeedType.setBackgroundResource(R.drawable.btn1);
-                break;
-
-            case 1:
-                btnRightFeedType.setBackgroundResource(R.drawable.btn1);
-                break;
-        }
+//        switch (selectedFeedSubType){
+//            case 0:
+//                btnLeftFeedType.setBackgroundResource(R.drawable.btn1);
+//                break;
+//
+//            case 1:
+//                btnRightFeedType.setBackgroundResource(R.drawable.btn1);
+//                break;
+//        }
     }
 
     /**
@@ -700,8 +749,8 @@ public class edit extends Activity {
         resultTime1.setText(formatTime.format(receivedFeed.getStartCal().getTime()));
         resultTime2.setText(formatTime.format(receivedFeed.getEndCal().getTime()));
 
-        EditText wb = (EditText)findViewById(R.id.btnWeight1);
-        EditText wa = (EditText)findViewById(R.id.btnWeight2);
+        EditText wb = (EditText)findViewById(R.id.TextRWB);
+        EditText wa = (EditText)findViewById(R.id.TextRWA);
         EditText com = (EditText)findViewById(R.id.Comments);
 
         wb.setText("" + receivedFeed.getWeightBefore());
@@ -711,7 +760,7 @@ public class edit extends Activity {
         com.setText(receivedFeed.getComment());
         //This only sets teh current values, It does not initialise the page with these values
         selectedFeedType = receivedFeed.getType();
-        selectedFeedSubType = receivedFeed.getSubType();
+        //selectedFeedSubType = receivedFeed.getSubType();
 
         varStartDate = receivedFeed.getStartCal();
         varEndDate = receivedFeed.getEndCal();

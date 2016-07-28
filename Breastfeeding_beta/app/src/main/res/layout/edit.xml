@@ -202,8 +202,9 @@
                 android:id="@+id/LeftWeightBefore"
                 android:layout_marginTop="5dp"
                 android:layout_marginLeft="25dp"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:gravity="left"
                 android:layout_alignParentLeft="true"
                 android:text=""
                 android:textSize="12dp"
@@ -212,13 +213,15 @@
             <TextView
                 android:id="@+id/LeftWeightAfter"
                 android:layout_marginTop="5dp"
-                android:layout_marginRight="45dp"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:gravity="left"
                 android:text=""
                 android:textSize="12dp"
-                android:layout_below="@+id/btnType1"/>
+                android:layout_below="@+id/btnType2"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="25dp"
+                android:layout_alignParentEnd="false" />
 
             <EditText
                 android:id="@+id/TextLWB"
@@ -243,7 +246,7 @@
                 android:hint="@string/grams"
                 android:gravity="left"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/LeftWeightBefore"
+                android:layout_below="@+id/LeftWeightAfter"
                 android:background="@drawable/textview_border"
                 android:padding="7dp"
                 android:inputType="number"/>
@@ -251,20 +254,22 @@
             <TextView
                 android:id="@+id/RightWeightBefore"
                 android:layout_marginTop="5dp"
-                android:layout_marginLeft="25dp"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:gravity="left"
                 android:text=""
                 android:textSize="12dp"
-                android:layout_below="@+id/TextLWB"/>
+                android:layout_below="@+id/TextLWB"
+                android:layout_marginLeft="25dp"
+                android:layout_alignParentLeft="true" />
 
             <TextView
                 android:id="@+id/RightWeightAfter"
                 android:layout_marginTop="5dp"
-                android:layout_marginRight="45dp"
-                android:layout_width="wrap_content"
+                android:layout_marginRight="25dp"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:gravity="left"
                 android:layout_alignParentRight="true"
                 android:text=""
                 android:textSize="12dp"
@@ -299,18 +304,18 @@
                 android:inputType="number" />
 
             <TextView
-                android:id="@+id/Coments"
+                android:id="@+id/CommentsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Comments"
                 android:layout_below="@+id/TextRWB"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="20dp"
                 android:layout_marginLeft="25dp"/>
 
             <EditText
                 android:layout_width="310dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/Coments"
+                android:layout_below="@+id/CommentsText"
                 android:layout_marginLeft="25dp"
                 android:layout_marginTop="5dp"
                 android:background="@drawable/textview_border"

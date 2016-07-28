@@ -98,6 +98,8 @@ public class list extends Activity {
                 //TODO: Should this naming string be a global variable
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.newFeed", existingFeed);
 
+                //System.out.println(existingFeed.getLeftWeightBefore());
+
                 intent.putExtra("com.yifeilyf.breastfeeding_beta.editRequestCode", 1);
                 //RequestCode is the identifier sent to the edit activity, 0=newFeed 1=editFeed
                 //Open the edit activity with the existing feed for editing
@@ -221,14 +223,20 @@ public class list extends Activity {
         }
         feedBackingArray.add(newFeed);
         try {
-            JSONObject jsonObject = formatFeed(newFeed);
-            mAuthTask = new UserLoginTask(jsonObject.toString());
-            mAuthTask.execute((Void) null);
+            if (newFeed.getLeftWeightBefore() != -1) {  // Check if data for left exists (default value -1)
+                JSONObject jsonObject = formatFeed(newFeed);
+                mAuthTask = new UserLoginTask(jsonObject.toString());
+                mAuthTask.execute((Void) null);
+            }
+            if (newFeed.getRightWeightBefore() != -1) {
+                JSONObject jsonObject = formatFeed(newFeed);
+                mAuthTask = new UserLoginTask(jsonObject.toString());
+                mAuthTask.execute((Void) null);
+            }
+
         } catch (JSONException e) {
             return false;
         }
-
-
         return true;
     }
 
@@ -240,35 +248,66 @@ public class list extends Activity {
         JSONObject after = new JSONObject();
 
         //Write before and after times to JSONArrays
-        Date date =  newFeed.getStartCal().getTime();
-        before.put("date", sdf.format(date));
-        before.put("weight", newFeed.getWeightBefore());
 
-        date =  newFeed.getEndCal().getTime();
-        after.put("date", sdf.format(date));
-        after.put("weight", newFeed.getWeightAfter());
+        if (newFeed.getSide() == "L") {
+            Date date = newFeed.getStartCal().getTime();
+            before.put("date", sdf.format(date));
+            before.put("weight", newFeed.getLeftWeightBefore());
+
+            date = newFeed.getEndCal().getTime();
+            after.put("date", sdf.format(date));
+            after.put("weight", newFeed.getLeftWeightAfter());
+        } else if (newFeed.getSide() == "R") {
+            Date date = newFeed.getStartCal().getTime();
+            before.put("date", sdf.format(date));
+            before.put("weight", newFeed.getRightWeightBefore());
+
+            date = newFeed.getEndCal().getTime();
+            after.put("date", sdf.format(date));
+            after.put("weight", newFeed.getRightWeightAfter());
+        } else {
+            Date date = newFeed.getStartCal().getTime();
+            before.put("date", sdf.format(date));
+            before.put("weight", newFeed.getLeftWeightBefore());
+
+            date = newFeed.getEndCal().getTime();
+            after.put("date", sdf.format(date));
+            after.put("weight", newFeed.getLeftWeightAfter());
+        }
 
         //Write type and subtype of feed
-        if (newFeed.getType() == 0) {
+        if (newFeed.getType() == "B") {
             feed.put("type", "Breastfeed");
-        } else if (newFeed.getType() == 1) {
-            feed.put("type", "Expressed");
-        } else {
-            feed.put("type", "Supplementary");
-        }
 
-        if (newFeed.getType() != 2) {
-            if (newFeed.getSubType() == 0) {
+            if (newFeed.getSide() == "R") {
+                feed.put("side", "Right");
+            } else if (newFeed.getSide() == "L") {
                 feed.put("side", "Left");
             } else {
-                feed.put("side", "Right");
+                feed.put("side", "Both");
             }
 
-        } else if (newFeed.getSubType() == 0) {
-            feed.put("subtype", "Expressed");
+        } else if (newFeed.getType() == "E") {
+            feed.put("type", "Expressed");
+
+            if (newFeed.getSide() == "R") {
+                feed.put("side", "Right");
+            } else if (newFeed.getSide() == "L") {
+                feed.put("side", "Left");
+            } else {
+                feed.put("side", "Both");
+            }
+
         } else {
-            feed.put("subtype", "Formula");
+            feed.put("type", "Supplementary");
+            if (newFeed.getSubType() == "E") {
+                feed.put("subtype", "Expressed");
+            } else {
+                feed.put("subtype", "Formula");
+            }
         }
+
+
 
         //Write comment if exists
         if (!newFeed.getComment().equals("")) {
@@ -279,10 +318,12 @@ public class list extends Activity {
         feed.put("before", before);
         feed.put("after", after);
         feedlist.put(feed);
+
         JSONObject data = new JSONObject();
         data.put("feeds", feedlist);
-        System.out.println(data.toString());
+        //System.out.println(data.toString());
         return data;
+
     }
 
     /**
@@ -320,7 +361,6 @@ public class list extends Activity {
      * @param feedData The feed data received from the server (a JSONObject parsed as a String)
      */
     private Boolean initialise(String feedData) {
-        System.out.println(feedData);
         try {
             JSONObject jsonObject = new JSONObject(feedData);
             JSONArray feedArray = jsonObject.getJSONArray("feeds");
@@ -338,27 +378,38 @@ public class list extends Activity {
                 endCal.setTime(sdf.parse(data.getJSONObject("after").getString("date")));
                 feed.putEndCal(endCal);
 
+                feed.putType(data.getString("type"));
+                feed.putSubType(data.getString("subtype"));
+                feed.putSide(data.getString("side"));
+
                 //Add weights
-                feed.putWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
-                System.out.println(data.getJSONObject("before").getString("weight"));
-                feed.putWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
-                System.out.println(data.getJSONObject("after").getString("weight"));
+                if (feed.getSide() == "L") {
+                    feed.putLeftWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
+                    feed.putLeftWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
+                } else {
+                    feed.putRightWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
+                    feed.putRightWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
+                }
+
                 feed.putComment(data.getString("comment"));
 
                 //Add feed types
+                /*
                 if (data.getString("type").equals("B")) {
                     feed.putType(0);
                 } else if (data.getString("type").equals("E")) {
                     feed.putType(1);
                 } else {
                     feed.putType(2);
-                }
+                }*/
 
+                /*
                 if (data.getString("subtype").equals("U") || data.getString("subtype").equals("L") || data.getString("subtype").equals("E")) {
                     feed.putSubType(0);
                 } else {
                     feed.putSubType(1);
-                }
+                }*/
+
 
                 //Submit feed
                 int id = feed.getID();

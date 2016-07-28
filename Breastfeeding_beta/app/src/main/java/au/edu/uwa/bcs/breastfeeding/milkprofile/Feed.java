@@ -13,13 +13,20 @@ import java.util.Calendar;
 public class Feed implements Parcelable, Comparable<Feed> {
 
     private int ID;
-    private int type = -1; //(0,1,2) breastfeed expressed supplementary
-    private int subType = -1; // (0,1) left,right or expressed,supplementary
-    private int weightBefore = -1;
-    private int weightAfter = -1;
+    private String type = ""; //(0,1,2) breastfeed expressed supplementary
+    private String subType = ""; // (0,1) left,right or expressed,supplementary
+    private String side = "";
+    private int leftWeightBefore = -1;
+    private int leftWeightAfter = -1;
+    private int rightWeightBefore = -1;
+    private int rightWeightAfter = -1;
+    private int weightBefore = -1;  //redundant
+    private int weightAfter = -1;   //redundant
     private String comment = "";
     private Calendar startCal = Calendar.getInstance();
     private Calendar endCal = Calendar.getInstance();
+    private long feedTime = 0;
+
 
     private SimpleDateFormat formatDateTime = new SimpleDateFormat("dd/MM/yyyy  HH:mm");
     //displays as below
@@ -75,42 +82,72 @@ public class Feed implements Parcelable, Comparable<Feed> {
      *
      * @return
      */
-    public int getType() {return type;}
+    public String getType() {return type;}
     /**
      *
      * @return
      */
-    public void putType(int type) {this.type = type;}
+    public void putType(String type) {this.type = type;}
     /**
      *
      * @return
      */
-    public int getSubType() {return subType;}
+    public String getSubType() {return subType;}
     /**
      *
      * @return
      */
-    public void putSubType(int type) {subType = type;}
+    public void putSubType(String type) {subType = type;}
     /**
      *
      * @return
      */
-    public int getWeightBefore() {return weightBefore;}
+    public String getSide() {return side;}
     /**
      *
      * @return
      */
-    public void putWeightBefore(int weight) {weightBefore = weight;}
+    public void putSide(String side) {this.side = side;}
     /**
      *
      * @return
      */
-    public int getWeightAfter() {return weightAfter;}
+    public int getRightWeightBefore() {return rightWeightBefore;}
     /**
      *
      * @return
      */
-    public void putWeightAfter(int weight) {weightAfter = weight;}
+    public void putRightWeightBefore(int weight) {rightWeightBefore = weight; weightBefore = weight;}
+    /**
+     *
+     * @return
+     */
+    public int getRightWeightAfter() {return rightWeightAfter;}
+    /**
+     *
+     * @return
+     */
+    public void putRightWeightAfter(int weight) {rightWeightAfter = weight; weightAfter = weight;}
+    /**d
+     *
+     * @return
+     */
+    public int getLeftWeightBefore() {return leftWeightBefore;}
+    /**
+     *
+     * @return
+     */
+    public void putLeftWeightBefore(int weight) {leftWeightBefore = weight; weightBefore = weight;}
+    /**
+     *
+     * @return
+     */
+    public int getLeftWeightAfter() {return leftWeightAfter;}
+    /**
+     *
+     * @return
+     */
+    public void putLeftWeightAfter(int weight) {leftWeightAfter = weight; weightAfter = weight;}
     /**
      *
      * @return
@@ -130,7 +167,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
 
     public String toString(){
-        return formatDateTime.format(getStartCal().getTime());
+        feedTime = (getEndCal().getTimeInMillis() - getStartCal().getTimeInMillis()) / 60000;
+        return (formatDateTime.format(getStartCal().getTime()) + "\t\t(" + String.valueOf(feedTime)) + " mins)";
     }
 
 
@@ -141,20 +179,29 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
     private Feed(Parcel in) {
         ID = in.readInt();
-        type= in.readInt();
-        subType= in.readInt();
+        type= in.readString();
+        subType= in.readString();
+        side= in.readString();
         weightBefore= in.readInt();
         weightAfter= in.readInt();
         comment= in.readString();
         startCal.setTimeInMillis(in.readLong());
         endCal.setTimeInMillis(in.readLong());
 
+        if (side == "L") {
+            leftWeightBefore = weightBefore;
+            leftWeightAfter = weightAfter;
+        } else {
+            rightWeightBefore = weightBefore;
+            rightWeightAfter = weightAfter;
+        }
     }
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeInt(ID);
-        out.writeInt(type);
-        out.writeInt(subType);
+        out.writeString(type);
+        out.writeString(subType);
+        out.writeString(side);
         out.writeInt(weightBefore);
         out.writeInt(weightAfter);
         out.writeString(comment);

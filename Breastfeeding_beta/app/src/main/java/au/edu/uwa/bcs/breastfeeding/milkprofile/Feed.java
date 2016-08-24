@@ -14,12 +14,8 @@ public class Feed implements Parcelable, Comparable<Feed> {
 
     private int ID;
     private String type = ""; //(0,1,2) breastfeed expressed supplementary
-    private String subType = ""; // (0,1) left,right or expressed,supplementary
-    private String side = "";
-    private int leftWeightBefore = -1;
-    private int leftWeightAfter = -1;
-    private int rightWeightBefore = -1;
-    private int rightWeightAfter = -1;
+    private String subType = "U"; // (0,1) left/right/both or expressed/supplementary
+    private String side = "U";
     private int weightBefore = -1;  //redundant
     private int weightAfter = -1;   //redundant
     private String comment = "";
@@ -108,46 +104,26 @@ public class Feed implements Parcelable, Comparable<Feed> {
      * @return
      */
     public void putSide(String side) {this.side = side;}
-    /**
-     *
-     * @return
-     */
-    public int getRightWeightBefore() {return rightWeightBefore;}
-    /**
-     *
-     * @return
-     */
-    public void putRightWeightBefore(int weight) {rightWeightBefore = weight; weightBefore = weight;}
-    /**
-     *
-     * @return
-     */
-    public int getRightWeightAfter() {return rightWeightAfter;}
-    /**
-     *
-     * @return
-     */
-    public void putRightWeightAfter(int weight) {rightWeightAfter = weight; weightAfter = weight;}
     /**d
      *
      * @return
      */
-    public int getLeftWeightBefore() {return leftWeightBefore;}
+    public int getWeightBefore() {return weightBefore;}
     /**
      *
      * @return
      */
-    public void putLeftWeightBefore(int weight) {leftWeightBefore = weight; weightBefore = weight;}
+    public void putWeightBefore(int weight) {weightBefore = weight;}
     /**
      *
      * @return
      */
-    public int getLeftWeightAfter() {return leftWeightAfter;}
+    public int getWeightAfter() {return weightAfter;}
     /**
      *
      * @return
      */
-    public void putLeftWeightAfter(int weight) {leftWeightAfter = weight; weightAfter = weight;}
+    public void putWeightAfter(int weight) {weightAfter = weight;}
     /**
      *
      * @return
@@ -187,14 +163,6 @@ public class Feed implements Parcelable, Comparable<Feed> {
         comment= in.readString();
         startCal.setTimeInMillis(in.readLong());
         endCal.setTimeInMillis(in.readLong());
-
-        if (side == "L") {
-            leftWeightBefore = weightBefore;
-            leftWeightAfter = weightAfter;
-        } else {
-            rightWeightBefore = weightBefore;
-            rightWeightAfter = weightAfter;
-        }
     }
     @Override
     public void writeToParcel(Parcel out, int flags) {

@@ -182,6 +182,7 @@ public class list extends Activity {
             }
         });
         feedListAdapter.notifyDataSetChanged();
+        onPause();
     }
 
     /**
@@ -223,13 +224,9 @@ public class list extends Activity {
         }
         feedBackingArray.add(newFeed);
         try {
-            if (newFeed.getLeftWeightBefore() != -1) {  // Check if data for left exists (default value -1)
+            if (newFeed.getWeightBefore() != -1) {  // Check if data for left exists (default value -1)
                 JSONObject jsonObject = formatFeed(newFeed);
-                mAuthTask = new UserLoginTask(jsonObject.toString());
-                mAuthTask.execute((Void) null);
-            }
-            if (newFeed.getRightWeightBefore() != -1) {
-                JSONObject jsonObject = formatFeed(newFeed);
+                System.out.println(jsonObject);
                 mAuthTask = new UserLoginTask(jsonObject.toString());
                 mAuthTask.execute((Void) null);
             }
@@ -249,50 +246,33 @@ public class list extends Activity {
 
         //Write before and after times to JSONArrays
 
-        if (newFeed.getSide() == "L") {
-            Date date = newFeed.getStartCal().getTime();
-            before.put("date", sdf.format(date));
-            before.put("weight", newFeed.getLeftWeightBefore());
+        Date date = newFeed.getStartCal().getTime();
+        before.put("date", sdf.format(date));
+        before.put("weight", newFeed.getWeightBefore());
 
-            date = newFeed.getEndCal().getTime();
-            after.put("date", sdf.format(date));
-            after.put("weight", newFeed.getLeftWeightAfter());
-        } else if (newFeed.getSide() == "R") {
-            Date date = newFeed.getStartCal().getTime();
-            before.put("date", sdf.format(date));
-            before.put("weight", newFeed.getRightWeightBefore());
+        date = newFeed.getEndCal().getTime();
+        after.put("date", sdf.format(date));
+        after.put("weight", newFeed.getWeightAfter());
 
-            date = newFeed.getEndCal().getTime();
-            after.put("date", sdf.format(date));
-            after.put("weight", newFeed.getRightWeightAfter());
-        } else {
-            Date date = newFeed.getStartCal().getTime();
-            before.put("date", sdf.format(date));
-            before.put("weight", newFeed.getLeftWeightBefore());
-
-            date = newFeed.getEndCal().getTime();
-            after.put("date", sdf.format(date));
-            after.put("weight", newFeed.getLeftWeightAfter());
-        }
 
         //Write type and subtype of feed
-        if (newFeed.getType() == "B") {
+        if (newFeed.getType().equals("B")) {
             feed.put("type", "Breastfeed");
 
-            if (newFeed.getSide() == "R") {
+            if (newFeed.getSide().equals("R")) {
                 feed.put("side", "Right");
-            } else if (newFeed.getSide() == "L") {
+            } else if (newFeed.getSide().equals("L")) {
                 feed.put("side", "Left");
             } else {
                 feed.put("side", "Both");
             }
 
-        } else if (newFeed.getType() == "E") {
+        } else if (newFeed.getType().equals("E")) {
             feed.put("type", "Expressed");
 
-            if (newFeed.getSide() == "R") {
+            if (newFeed.getSide().equals("R")) {
                 feed.put("side", "Right");
-            } else if (newFeed.getSide() == "L") {
+            } else if (newFeed.getSide().equals("L")) {
                 feed.put("side", "Left");
             } else {
                 feed.put("side", "Both");
@@ -300,7 +280,7 @@ public class list extends Activity {
 
         } else {
             feed.put("type", "Supplementary");
-            if (newFeed.getSubType() == "E") {
+            if (newFeed.getSubType().equals("E")) {
                 feed.put("subtype", "Expressed");
             } else {
                 feed.put("subtype", "Formula");
@@ -315,9 +295,10 @@ public class list extends Activity {
         }
 
         //Write times Arrays into feed master Array
+        feedlist.put(feed);
         feed.put("before", before);
         feed.put("after", after);
-        feedlist.put(feed);
+
 
         JSONObject data = new JSONObject();
         data.put("feeds", feedlist);
@@ -383,13 +364,8 @@ public class list extends Activity {
                 feed.putSide(data.getString("side"));
 
                 //Add weights
-                if (feed.getSide() == "L") {
-                    feed.putLeftWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
-                    feed.putLeftWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
-                } else {
-                    feed.putRightWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
-                    feed.putRightWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
-                }
+                feed.putWeightBefore(Integer.parseInt(data.getJSONObject("before").getString("weight")));
+                feed.putWeightAfter(Integer.parseInt(data.getJSONObject("after").getString("weight")));
 
                 feed.putComment(data.getString("comment"));
 
@@ -525,7 +501,7 @@ public class list extends Activity {
             mAuthTask = null;
 
             if (success) {
-                finish();
+                //finish();
             } else {
 
             }
